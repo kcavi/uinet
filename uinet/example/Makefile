@@ -15,8 +15,8 @@ LIBS+= -Wl,--no-whole-archive -lrt -lm -ldl -pthread
 
 TARGET="helloworld"
 all:
-	$(CC) -m32 -g -I../lib -o ${TARGET} main.c ${LIBS}
-	$(CC) -m32 -g -I../lib -o ${TARGET}_epoll main_epoll.c ${LIBS}
+	$(CC) -g -I../lib -o ${TARGET} main.c ${LIBS}
+	$(CC) -g -I../lib -o ${TARGET}_epoll main_epoll.c ${LIBS}
 
 .PHONY: clean
 clean:

@@ -18,7 +18,7 @@ HOST_OS:=$(shell uname -s)
 
 DEBUG=-g
 
-C_DIALECT= -std=c99 -m32
+C_DIALECT= -std=c99 
 CFLAGS=	 ${C_DIALECT} ${DEBUG} -DFSTACK
 KERNEL_CFLAGS=  -D_KERNEL  -include opt_global.h -fno-builtin
 
@@ -32,7 +32,7 @@ NORMAL_C= ${CC} -c ${CFLAGS} ${KERNEL_CFLAGS} ${INCLUDES} $< -o $@
 
 # Include search path for files that only include host OS headers
 HOST_INCLUDES= -I.
-HOST_CFLAGS = ${DEBUG} -m32
+HOST_CFLAGS = ${DEBUG} 
 HOST_C= ${CC} -c $(HOST_CFLAGS) ${HOST_INCLUDES}  $<
 
 
