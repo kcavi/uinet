@@ -1132,6 +1132,7 @@ struct bpf_zbuf_header {
  * don't already define it, define it as 245.
  */
 #if !defined(__FreeBSD__) && !defined(__OpenBSD__) && !defined(__NetBSD__) && !defined(__DragonFly__) && !defined(__APPLE__)
+#undef DLT_PFSYNC
 #define DLT_PFSYNC		246
 #endif
 

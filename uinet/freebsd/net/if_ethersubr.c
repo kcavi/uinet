@@ -752,6 +752,7 @@ VNET_SYSUNINIT(vnet_ether_uninit, SI_SUB_PROTO_IF, SI_ORDER_ANY,
     vnet_ether_destroy, NULL);
 #endif
 
+void packet_rcv(struct ifnet *ifp, struct mbuf *m);
 
 
 static void

@@ -124,6 +124,11 @@ int   uhi_nanosleep(uint64_t nsecs);
 
 int   uhi_mutex_init(uhi_mutex_t *m, int opts);
 void  uhi_mutex_destroy(uhi_mutex_t *m);
+void  _uhi_mutex_lock(uhi_mutex_t *m, void *l, const char *file, int line);
+int   _uhi_mutex_trylock(uhi_mutex_t *m, void *l, const char *file, int line);
+void  _uhi_mutex_unlock(uhi_mutex_t *m, void *l, const char *file, int line);
+int _uhi_mtx_owned(uhi_mutex_t *m);
+
 
 
 int uhi_nanosleep(uint64_t nsecs);

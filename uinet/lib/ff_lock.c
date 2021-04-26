@@ -120,7 +120,7 @@ void
 __mtx_lock_spin_flags(volatile uintptr_t *c, int opts, const char *file,
     int line)
 {
-	_uhi_mutex_lock(c, c, file, line);
+	_uhi_mutex_lock((uhi_mutex_t *)c, (void *)c, file, line);
 }
 
 
@@ -128,7 +128,7 @@ void
 __mtx_unlock_spin_flags(volatile uintptr_t *c, int opts, const char *file,
     int line)
 {
-	_uhi_mutex_unlock(c, c, file, line);
+	_uhi_mutex_unlock((uhi_mutex_t *)c, (void *)c, file, line);
 }
 
 
@@ -137,7 +137,7 @@ int
 _mtx_trylock_flags_(volatile uintptr_t *c, int opts, const char *file, int line)
 {
 	int rval;
-	rval = _uhi_mutex_trylock(c, c, file, line);
+	rval = _uhi_mutex_trylock((uhi_mutex_t *)c, (void *)c, file, line);
 
 	return (rval);
 }
@@ -157,14 +157,14 @@ thread_lock_flags_(struct thread *td, int opts, const char *file, int line)
 void
 __mtx_lock_flags(volatile uintptr_t *c, int opts, const char *file, int line)
 {
-	_uhi_mutex_lock(c, c, file, line);
+	_uhi_mutex_lock((uhi_mutex_t *)c, (void *)c, file, line);
 }
 
 
 void
 __mtx_unlock_flags(volatile uintptr_t *c, int opts, const char *file, int line)
 {
-	_uhi_mutex_unlock(c, c, file, line);
+	_uhi_mutex_unlock((uhi_mutex_t *)c, (void *)c, file, line);
 }
 
 
