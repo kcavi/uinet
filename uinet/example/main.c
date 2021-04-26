@@ -561,7 +561,7 @@ void *pty_read_test(void *arg)
 
 
 
-void vty_main_loop(void *arg)
+void *vty_main_loop(void *arg)
 {	
 	struct timeval timer_now;
 	struct timeval *timer_wait;
@@ -633,7 +633,7 @@ void vty_main_loop(void *arg)
 		
 		}
 	}
-	return;
+	return NULL;
 }
 
 

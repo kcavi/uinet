@@ -121,7 +121,7 @@ _rw_init_flags(volatile uintptr_t *c, const char *name, int opts)
 	struct rwlock *rw;
 	int flags;
 
-	rw = rwlock2rw(c);
+	rw = rwlock2rw((void *)c);
 	
 	MPASS((opts & ~(RW_DUPOK | RW_NOPROFILE | RW_NOWITNESS | RW_QUIET |
 	    RW_RECURSE)) == 0);
@@ -153,7 +153,7 @@ _rw_destroy(volatile uintptr_t *c)
 void
 _rw_wlock_cookie(volatile uintptr_t *c, const char *file, int line)
 {
-	_uhi_rwlock_wlock((uhi_rwlock_t *)c, c, file, line);
+	_uhi_rwlock_wlock((uhi_rwlock_t *)c, (void *)c, file, line);
 }
 
 int
@@ -161,7 +161,7 @@ __rw_try_wlock(volatile uintptr_t *c, const char *file, int line)
 {
 	int rval;
 
-	rval = _uhi_rwlock_trywlock((uhi_rwlock_t *)c, c, file, line);
+	rval = _uhi_rwlock_trywlock((uhi_rwlock_t *)c, (void *)c, file, line);
 
 	return (rval);
 }
@@ -169,27 +169,27 @@ __rw_try_wlock(volatile uintptr_t *c, const char *file, int line)
 void
 _rw_wunlock_cookie(volatile uintptr_t *c, const char *file, int line)
 {
-	_uhi_rwlock_wunlock((uhi_rwlock_t *)c, c, file, line);
+	_uhi_rwlock_wunlock((uhi_rwlock_t *)c, (void *)c, file, line);
 }
 
 void
 __rw_rlock(volatile uintptr_t *c, const char *file, int line)
 {
-	_uhi_rwlock_rlock((uhi_rwlock_t *)c, c, file, line);
+	_uhi_rwlock_rlock((uhi_rwlock_t *)c, (void *)c, file, line);
 }
 
 int
 __rw_try_rlock(volatile uintptr_t *c, const char *file, int line)
 {
 	int rval;
-	rval = _uhi_rwlock_tryrlock((uhi_rwlock_t *)c, c, file, line);
+	rval = _uhi_rwlock_tryrlock((uhi_rwlock_t *)c, (void *)c, file, line);
 	return (rval);
 }
 
 void
 _rw_runlock_cookie(volatile uintptr_t *c, const char *file, int line)
 {
-	_uhi_rwlock_runlock((uhi_rwlock_t *)c, c, file, line);
+	_uhi_rwlock_runlock((uhi_rwlock_t *)c, (void *)c, file, line);
 }
 
 int
@@ -197,7 +197,7 @@ __rw_try_upgrade(volatile uintptr_t *c, const char *file, int line)
 {
 	int rval;
 
-	rval = _uhi_rwlock_tryupgrade((uhi_rwlock_t *)c, c, file, line);
+	rval = _uhi_rwlock_tryupgrade((uhi_rwlock_t *)c, (void *)c, file, line);
 	/* 0 means fail; non-zero means success */
 	/* XXX uhi_rwlock_tryupgrade always returns 0? */
 
@@ -207,7 +207,7 @@ __rw_try_upgrade(volatile uintptr_t *c, const char *file, int line)
 void
 __rw_downgrade(volatile uintptr_t *c, const char *file, int line)
 {
-	_uhi_rwlock_downgrade((uhi_rwlock_t *)c, c, file, line);
+	_uhi_rwlock_downgrade((uhi_rwlock_t *)c, (void *)c, file, line);
 }
 
 

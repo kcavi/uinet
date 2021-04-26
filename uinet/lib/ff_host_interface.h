@@ -133,6 +133,19 @@ int   uhi_thread_setprio_rt(unsigned int prio);
 void ff_thread_set_name(const char *name);
 
 
+int   uhi_rwlock_init(uhi_rwlock_t *rw, int opts);
+void  uhi_rwlock_destroy(uhi_rwlock_t *rw);
+void  _uhi_rwlock_wlock(uhi_rwlock_t *rw, void *l, const char *file, int line);
+int   _uhi_rwlock_trywlock(uhi_rwlock_t *rw, void *l, const char *file, int line);
+void  _uhi_rwlock_wunlock(uhi_rwlock_t *rw, void *l, const char *file, int line);
+void  _uhi_rwlock_rlock(uhi_rwlock_t *rw, void *l, const char *file, int line);
+int   _uhi_rwlock_tryrlock(uhi_rwlock_t *rw, void *l, const char *file, int line);
+void  _uhi_rwlock_runlock(uhi_rwlock_t *rw, void *l, const char *file, int line);
+int   _uhi_rwlock_tryupgrade(uhi_rwlock_t *rw, void *l, const char *file, int line);
+void  _uhi_rwlock_downgrade(uhi_rwlock_t *rw, void *l, const char *file, int line);
+int _uhi_rwlock_wowned(uhi_rwlock_t *rw);
+
+
 int usp_pthread_create(char *name, pthread_t *thread, const pthread_attr_t *attr,
                           void *(*start_routine) (void *), void *arg);
 

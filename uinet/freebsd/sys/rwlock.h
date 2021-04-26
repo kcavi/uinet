@@ -150,36 +150,36 @@ void	__rw_assert(const volatile uintptr_t *c, int what, const char *file,
  * failing compilation as the rw_lock reserved member will not be found.
  */
 #define	rw_init(rw, n)							\
-	_rw_init_flags(&(rw)->rw_lock, n, 0)
+	_rw_init_flags((volatile uintptr_t *)&(rw)->rw_lock, n, 0)
 #define	rw_init_flags(rw, n, o)						\
-	_rw_init_flags(&(rw)->rw_lock, n, o)
+	_rw_init_flags((volatile uintptr_t *)&(rw)->rw_lock, n, o)
 #define	rw_destroy(rw)							\
-	_rw_destroy(&(rw)->rw_lock)
+	_rw_destroy((volatile uintptr_t *)&(rw)->rw_lock)
 #define	rw_wowned(rw)							\
-	_rw_wowned(&(rw)->rw_lock)
+	_rw_wowned((volatile uintptr_t *)&(rw)->rw_lock)
 #define	_rw_wlock(rw, f, l)						\
-	_rw_wlock_cookie(&(rw)->rw_lock, f, l)
+	_rw_wlock_cookie((volatile uintptr_t *)&(rw)->rw_lock, f, l)
 #define	_rw_try_wlock(rw, f, l)						\
-	__rw_try_wlock(&(rw)->rw_lock, f, l)
+	__rw_try_wlock((volatile uintptr_t *)&(rw)->rw_lock, f, l)
 #define	_rw_wunlock(rw, f, l)						\
-	_rw_wunlock_cookie(&(rw)->rw_lock, f, l)
+	_rw_wunlock_cookie((volatile uintptr_t *)&(rw)->rw_lock, f, l)
 #define	_rw_rlock(rw, f, l)						\
-	__rw_rlock(&(rw)->rw_lock, f, l)
+	__rw_rlock((volatile uintptr_t *)&(rw)->rw_lock, f, l)
 #define	_rw_try_rlock(rw, f, l)						\
-	__rw_try_rlock(&(rw)->rw_lock, f, l)
+	__rw_try_rlock((volatile uintptr_t *)&(rw)->rw_lock, f, l)
 #define	_rw_runlock(rw, f, l)						\
-	_rw_runlock_cookie(&(rw)->rw_lock, f, l)
+	_rw_runlock_cookie((volatile uintptr_t *)&(rw)->rw_lock, f, l)
 #define	_rw_wlock_hard(rw, t, f, l)					\
-	__rw_wlock_hard(&(rw)->rw_lock, t, f, l)
+	__rw_wlock_hard((volatile uintptr_t *)&(rw)->rw_lock, t, f, l)
 #define	_rw_wunlock_hard(rw, t, f, l)					\
-	__rw_wunlock_hard(&(rw)->rw_lock, t, f, l)
+	__rw_wunlock_hard((volatile uintptr_t *)&(rw)->rw_lock, t, f, l)
 #define	_rw_try_upgrade(rw, f, l)					\
-	__rw_try_upgrade(&(rw)->rw_lock, f, l)
+	__rw_try_upgrade((volatile uintptr_t *)&(rw)->rw_lock, f, l)
 #define	_rw_downgrade(rw, f, l)						\
-	__rw_downgrade(&(rw)->rw_lock, f, l)
+	__rw_downgrade((volatile uintptr_t *)&(rw)->rw_lock, f, l)
 #if defined(INVARIANTS) || defined(INVARIANT_SUPPORT)
 #define	_rw_assert(rw, w, f, l)						\
-	__rw_assert(&(rw)->rw_lock, w, f, l)
+	__rw_assert((volatile uintptr_t *)&(rw)->rw_lock, w, f, l)
 #endif
 
 
