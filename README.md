@@ -9,8 +9,18 @@ userspace netstack basic freebsd
 默认的ARCH为x86_64，需要修改可以更改lib/machine_include/machine
 
 运行方法：
-example/helloworld -i eth0
+./example/helloworld -i ens38
 
-eth0为本机的物理接口名
+ens38为本机的物理接口名
 
-测试代码在example/main.c
+接口要设置为混杂模式，ifconfig ens38 promisc
+
+配置文件在config.ini，可以修改接口ip等参数
+
+测试代码在example/main.c，已完成UDP,TCP，socket，select测试
+
+
+默认测试方法：直接通过浏览器访问配置文件的ip地址
+
+测试环境：ubuntu18.4
+

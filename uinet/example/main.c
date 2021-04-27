@@ -1500,7 +1500,7 @@ int main(int argc, char * argv[])
 
 #endif
 
-#if 1  /*af_unix tcp*/
+#if 0  /*af_unix tcp*/
 	sleep(2);
 	pthread_create(&pid, NULL,unix_tcp_server_test, NULL);
 
@@ -1536,7 +1536,7 @@ int main(int argc, char * argv[])
 	usp_pthread_create("ipv6_udp_client",&pid, NULL,ipv6_udp_client_test, NULL);
 #endif
 
-#if 0
+#if 1
 	sleep(2);
 	usp_pthread_create("tcp_web",&pid, NULL,tcp_web_test, NULL);
 #endif
