@@ -58,7 +58,7 @@ struct unrhdr *devfs_inos;
 
 
 void
-biofinish(struct bio *bp, struct devstat *stat, int error)
+biofinish(struct bio *bp, void *stat, int error)
 {
 	printf("%s %d\n",__func__,__LINE__);
 }

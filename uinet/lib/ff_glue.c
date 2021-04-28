@@ -100,6 +100,7 @@ MALLOC_DEFINE(M_IP6OPT, "ip6opt", "IPv6 options");
 //MALLOC_DEFINE(M_IP6NDP, "ip6ndp", "IPv6 Neighbor Discovery");
 
 static void configure_final(void *dummy);
+int nanosleep(const struct timespec *req, struct timespec *rem);
 
 SYSINIT(configure3, SI_SUB_CONFIGURE, SI_ORDER_ANY, configure_final, NULL);
 

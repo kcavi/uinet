@@ -46,6 +46,7 @@ __FBSDID("$FreeBSD: stable/11/sys/dev/pty/pty.c 331722 2018-03-29 02:50:57Z eadl
 #include <sys/filedesc.h>
 #include <sys/filio.h>
 
+int pts_slave_tty_alloc(struct tty *tp,int fflags, struct thread *td, struct file *fp);
 
 /*
  * This driver implements a BSD-style compatibility naming scheme for

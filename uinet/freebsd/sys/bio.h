@@ -139,7 +139,7 @@ extern struct vm_map *bio_transient_map;
 extern int bio_transient_maxcnt;
 
 void biodone(struct bio *bp);
-void biofinish(struct bio *bp, struct devstat *stat, int error);
+void biofinish(struct bio *bp, void *stat, int error);
 int biowait(struct bio *bp, const char *wchan);
 
 void bioq_disksort(struct bio_queue_head *ap, struct bio *bp);

@@ -2473,6 +2473,8 @@ LibAliasInit(struct libalias *la)
 	if (la == NULL) {
 #ifdef _KERNEL
 #undef malloc	/* XXX: ugly */
+#define malloc(x,y,z) freebsd_malloc(x,y,z)
+
 		la = malloc(sizeof *la, M_ALIAS, M_WAITOK | M_ZERO);
 #else
 		la = calloc(sizeof *la, 1);

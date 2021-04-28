@@ -46,10 +46,11 @@
 #include "ff_errno.h"
 
 static struct timespec current_ts;
+void ff_th_init(const char *name);
+int pthread_setname_np(pthread_t thread, const char *name);
 
 
-void
-uhi_clock_gettime(int id, int64_t *sec, long *nsec)
+void uhi_clock_gettime(int id, int64_t *sec, long *nsec)
 {
 
 	struct timespec ts;
@@ -80,8 +81,7 @@ uhi_clock_gettime(int id, int64_t *sec, long *nsec)
 }
 
 
-int
-uhi_cond_init(uhi_cond_t *c)
+int uhi_cond_init(uhi_cond_t *c)
 {
 	pthread_condattr_t attr;
 	pthread_cond_t *pc;
@@ -103,8 +103,7 @@ uhi_cond_init(uhi_cond_t *c)
 }
 
 
-void
-uhi_cond_destroy(uhi_cond_t *c)
+void uhi_cond_destroy(uhi_cond_t *c)
 {
 	pthread_cond_t *pc;
 	
@@ -115,15 +114,13 @@ uhi_cond_destroy(uhi_cond_t *c)
 }
 
 
-void
-uhi_cond_wait(uhi_cond_t *c, uhi_mutex_t *m)
+void uhi_cond_wait(uhi_cond_t *c, uhi_mutex_t *m)
 {
 	pthread_cond_wait((pthread_cond_t *)(*c), (pthread_mutex_t *)(*m));
 }
 
 
-int
-uhi_cond_timedwait(uhi_cond_t *c, uhi_mutex_t *m, uint64_t nsecs)
+int uhi_cond_timedwait(uhi_cond_t *c, uhi_mutex_t *m, uint64_t nsecs)
 {
 	struct timespec abstime;
 	int64_t now_sec;
@@ -144,22 +141,19 @@ uhi_cond_timedwait(uhi_cond_t *c, uhi_mutex_t *m, uint64_t nsecs)
 }
 
 
-void
-uhi_cond_signal(uhi_cond_t *c)
+void uhi_cond_signal(uhi_cond_t *c)
 {
 	pthread_cond_signal((pthread_cond_t *)(*c));
 }
 
 
-void
-uhi_cond_broadcast(uhi_cond_t *c)
+void uhi_cond_broadcast(uhi_cond_t *c)
 {
 	pthread_cond_broadcast((pthread_cond_t *)(*c));
 }
 
 
-int
-uhi_mutex_init(uhi_mutex_t *m, int opts)
+int uhi_mutex_init(uhi_mutex_t *m, int opts)
 {
 	pthread_mutexattr_t attr;
 	pthread_mutex_t *pm;
@@ -188,8 +182,7 @@ uhi_mutex_init(uhi_mutex_t *m, int opts)
 }
 
 
-void
-uhi_mutex_destroy(uhi_mutex_t *m)
+void uhi_mutex_destroy(uhi_mutex_t *m)
 {
 	pthread_mutex_t *pm;
 	
@@ -201,8 +194,7 @@ uhi_mutex_destroy(uhi_mutex_t *m)
 
 
 
-void
-_uhi_mutex_lock(uhi_mutex_t *m, void *l, const char *file, int line)
+void _uhi_mutex_lock(uhi_mutex_t *m, void *l, const char *file, int line)
 {
 	pthread_mutex_lock((pthread_mutex_t *)(*m));
 }
@@ -211,8 +203,7 @@ _uhi_mutex_lock(uhi_mutex_t *m, void *l, const char *file, int line)
 /*
  * Returns 0 if the mutex cannot be acquired, non-zero if it can.
  */
-int
-_uhi_mutex_trylock(uhi_mutex_t *m, void *l, const char *file, int line)
+int _uhi_mutex_trylock(uhi_mutex_t *m, void *l, const char *file, int line)
 {
 	int ret;
 	ret = (0 == pthread_mutex_trylock((pthread_mutex_t *)(*m)));
@@ -221,14 +212,12 @@ _uhi_mutex_trylock(uhi_mutex_t *m, void *l, const char *file, int line)
 }
 
 
-void
-_uhi_mutex_unlock(uhi_mutex_t *m, void *l, const char *file, int line)
+void _uhi_mutex_unlock(uhi_mutex_t *m, void *l, const char *file, int line)
 {
 	pthread_mutex_unlock((pthread_mutex_t *)(*m));
 }
 
-int
-uhi_rwlock_init(uhi_rwlock_t *rw, int opts)
+int uhi_rwlock_init(uhi_rwlock_t *rw, int opts)
 {
 	pthread_rwlockattr_t attr;
 	pthread_rwlock_t *pm;
@@ -252,8 +241,7 @@ uhi_rwlock_init(uhi_rwlock_t *rw, int opts)
 }
 
 
-void
-uhi_rwlock_destroy(uhi_rwlock_t *rw)
+void uhi_rwlock_destroy(uhi_rwlock_t *rw)
 {
 	pthread_rwlock_t *pm;
 	
@@ -265,12 +253,11 @@ uhi_rwlock_destroy(uhi_rwlock_t *rw)
 }
 
 
-void
-_uhi_rwlock_wlock(uhi_rwlock_t *rw, void *l, const char *file, int line)
+void _uhi_rwlock_wlock(uhi_rwlock_t *rw, void *l, const char *file, int line)
 {
 	if(*rw ==  NULL)
 	{
-		printf("%s %d rw=0x%x\n",__func__,__LINE__,rw);
+		printf("%s %d rw=0x%p\n",__func__,__LINE__,*rw);
 		return ;
 	}
 	
@@ -278,8 +265,7 @@ _uhi_rwlock_wlock(uhi_rwlock_t *rw, void *l, const char *file, int line)
 }
 
 
-int
-_uhi_rwlock_trywlock(uhi_rwlock_t *rw, void *l, const char *file, int line)
+int _uhi_rwlock_trywlock(uhi_rwlock_t *rw, void *l, const char *file, int line)
 {
 	int ret;
 
@@ -288,24 +274,22 @@ _uhi_rwlock_trywlock(uhi_rwlock_t *rw, void *l, const char *file, int line)
 }
 
 
-void
-_uhi_rwlock_wunlock(uhi_rwlock_t *rw, void *l, const char *file, int line)
+void _uhi_rwlock_wunlock(uhi_rwlock_t *rw, void *l, const char *file, int line)
 {
 	if(*rw ==  NULL)
 	{
-		printf("%s %d rw=0x%x\n",__func__,__LINE__,rw);
+		printf("%s %d rw=0x%p\n",__func__,__LINE__,*rw);
 		return ;
 	}
 	pthread_rwlock_unlock((pthread_rwlock_t *)(*rw));
 }
 
 
-void
-_uhi_rwlock_rlock(uhi_rwlock_t *rw, void *l, const char *file, int line)
+void _uhi_rwlock_rlock(uhi_rwlock_t *rw, void *l, const char *file, int line)
 {
 	if(*rw ==  NULL)
 	{
-		printf("%s %d rw=0x%x\n",__func__,__LINE__,rw);
+		printf("%s %d rw=0x%p\n",__func__,__LINE__,*rw);
 		return ;
 	}
 	
@@ -313,8 +297,7 @@ _uhi_rwlock_rlock(uhi_rwlock_t *rw, void *l, const char *file, int line)
 }
 
 
-int
-_uhi_rwlock_tryrlock(uhi_rwlock_t *rw, void *l, const char *file, int line)
+int _uhi_rwlock_tryrlock(uhi_rwlock_t *rw, void *l, const char *file, int line)
 {
 	int ret;
 
@@ -323,8 +306,7 @@ _uhi_rwlock_tryrlock(uhi_rwlock_t *rw, void *l, const char *file, int line)
 }
 
 
-void
-_uhi_rwlock_runlock(uhi_rwlock_t *rw, void *l, const char *file, int line)
+void _uhi_rwlock_runlock(uhi_rwlock_t *rw, void *l, const char *file, int line)
 {
 	if(*rw ==  NULL)
 	{
@@ -335,8 +317,7 @@ _uhi_rwlock_runlock(uhi_rwlock_t *rw, void *l, const char *file, int line)
 }
 
 
-int
-_uhi_rwlock_tryupgrade(uhi_rwlock_t *rw, void *l, const char *file, int line)
+int _uhi_rwlock_tryupgrade(uhi_rwlock_t *rw, void *l, const char *file, int line)
 {
 	/*
 	 * Always succeeds as this implementation is always an exclusive
@@ -346,8 +327,7 @@ _uhi_rwlock_tryupgrade(uhi_rwlock_t *rw, void *l, const char *file, int line)
 }
 
 
-void
-_uhi_rwlock_downgrade(uhi_rwlock_t *rw, void *l, const char *file, int line)
+void _uhi_rwlock_downgrade(uhi_rwlock_t *rw, void *l, const char *file, int line)
 {
 	/* 
 	 * Nothing to do here.  In this implementation, there is only one
@@ -401,8 +381,7 @@ int linux_open(const char *pathname, int flags, mode_t mode)
 }
 
 
-void
-ff_thread_set_name(const char *name)
+void ff_thread_set_name(const char *name)
 {
 	if (name != NULL) {
 		pthread_setname_np(pthread_self(), name);
@@ -414,8 +393,7 @@ ff_thread_set_name(const char *name)
  *  prio runs from 0 to 100, with 0 corresponding to the minimum possible
  *  priority and 100 corresponding to the maximum possible priority.
  */
-int
-uhi_thread_setprio(unsigned int prio)
+int uhi_thread_setprio(unsigned int prio)
 {
 	int policy;
 	struct sched_param sparam;
@@ -433,8 +411,7 @@ uhi_thread_setprio(unsigned int prio)
  *  prio runs from 0 to 100, with 0 corresponding to the minimum possible
  *  priority and 100 corresponding to the maximum possible priority.
  */
-int
-uhi_thread_setprio_rt(unsigned int prio)
+int uhi_thread_setprio_rt(unsigned int prio)
 {
 	pthread_t t;
 	int policy;
@@ -462,8 +439,7 @@ uhi_thread_setprio_rt(unsigned int prio)
 
 
 
-static void *
-pthread_start_routine(void *arg)
+static void *pthread_start_routine(void *arg)
 {
 	struct uhi_thread_start_args *tsa = arg;
 	int error;
@@ -507,8 +483,7 @@ pthread_start_routine(void *arg)
 }
 
 
-int
-uhi_thread_create(uhi_thread_t *new_thread, struct uhi_thread_start_args *start_args, unsigned int stack_bytes)
+int uhi_thread_create(uhi_thread_t *new_thread, struct uhi_thread_start_args *start_args, unsigned int stack_bytes)
 {
 	int error;
 	pthread_t thread;

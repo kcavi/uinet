@@ -44,11 +44,13 @@
  * runtime initialization.
  */
 
+/*
 typedef	int (*notifier_fn_t)(struct notifier_block *nb,
 			unsigned long action, void *data);
+*/
 
 struct notifier_block {
-	notifier_fn_t notifier_call;
+	int (*notifier_call)(struct notifier_block *nb, uint32_t action, void *data);
 	struct notifier_block  *next;
 	int priority;
 };

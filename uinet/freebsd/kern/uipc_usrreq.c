@@ -365,6 +365,7 @@ vn_start_write(struct vnode *vp, struct mount **mpp, int flags)
 	return 0;
 }
 
+#undef VATTR_NULL
 #define	VATTR_NULL(vap)	
 #define	ASSERT_VOP_ELOCKED(vp, str)	
 #define	ASSERT_VOP_LOCKED(vp, str)

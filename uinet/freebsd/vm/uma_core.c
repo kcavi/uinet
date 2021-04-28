@@ -1793,7 +1793,7 @@ uma_startup(void *bootmem, int boot_pages)
 		slab->us_flags = UMA_SLAB_BOOT;
 		LIST_INSERT_HEAD(&uma_boot_pages, slab, us_link);
 	}
-	mtx_init(&uma_boot_pages_mtx, "UMA boot pages", NULL, MTX_DEF);
+	mtx_init((struct mtx *)&uma_boot_pages_mtx, "UMA boot pages", NULL, MTX_DEF);
 
 #ifdef UMA_DEBUG
 	printf("Creating uma zone headers zone and keg.\n");

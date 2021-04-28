@@ -106,7 +106,10 @@ static int setutimes(struct thread *td, struct vnode *,
     const struct timespec *, int, int);
 static int vn_access(struct vnode *vp, int user_flags, struct ucred *cred,
     struct thread *td);
-
+int change_dir(struct vnode *vp, struct thread *td);
+void	vput(struct vnode *vp);
+int	vn_start_write(struct vnode *vp, struct mount **mpp, int flags);
+void	vn_finished_write(struct mount *mp);
 
 
 /*

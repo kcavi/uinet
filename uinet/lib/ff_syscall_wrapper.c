@@ -588,7 +588,7 @@ int
 usp_open(const char *pathname, int flags, mode_t mode)
 {
 	int rc;
-	if ((rc = kern_openat(curthread, AT_FDCWD, pathname, UIO_USERSPACE,
+	if ((rc = kern_openat(curthread, AT_FDCWD, (char *)pathname, UIO_USERSPACE,
 	    flags, mode)) < 0)
 	     goto kern_fail;
 	
@@ -742,7 +742,7 @@ usp_sendto(int s, const void *buf, size_t len, int flags,
     }
 #endif
 
-    msg.msg_name = to;
+    msg.msg_name = (char *)to;
     msg.msg_namelen = tolen;
     msg.msg_iov = &aiov;
     msg.msg_iovlen = 1;
@@ -930,7 +930,7 @@ usp_bind(int s, const struct usp_sockaddr *addr, socklen_t addrlen)
     struct sockaddr bsdaddr;
     //linux2freebsd_sockaddr(addr, addrlen, &bsdaddr);
 
-    if ((rc = kern_bindat(curthread, AT_FDCWD, s, addr)))
+    if ((rc = kern_bindat(curthread, AT_FDCWD, s, (struct sockaddr *)addr)))
         goto kern_fail;
 
     return (rc);
@@ -946,7 +946,7 @@ usp_connect(int s, const struct usp_sockaddr *name, socklen_t namelen)
     struct sockaddr bsdaddr;
     //linux2freebsd_sockaddr(name, namelen, &bsdaddr);
 
-    if ((rc = kern_connectat(curthread, AT_FDCWD, s, name)))
+    if ((rc = kern_connectat(curthread, AT_FDCWD, s, (struct sockaddr *)name)))
         goto kern_fail;
 
     return (rc);
@@ -1047,7 +1047,7 @@ usp_select(int nfds, usp_fd_set *readfds, usp_fd_set *writefds, usp_fd_set *exce
 {
     int rc;
 
-    rc = kern_select(curthread, nfds, readfds, writefds, exceptfds, timeout, NFDBITS);
+    rc = kern_select(curthread, nfds, (fd_set *)readfds, (fd_set *)writefds, (fd_set *)exceptfds, timeout, NFDBITS);
     if (rc)
         goto kern_fail;
     rc = curthread->td_retval[0];
@@ -1066,7 +1066,7 @@ usp_poll(struct usp_pollfd fds[], usp_nfds_t nfds, int timeout)
     struct timespec ts;
     ts.tv_sec = 0;
     ts.tv_nsec = 0;
-    if ((rc = kern_poll(curthread, fds, nfds, &ts, NULL)))
+    if ((rc = kern_poll(curthread, (struct pollfd *)fds, nfds, &ts, NULL)))
         goto kern_fail;
     rc = curthread->td_retval[0];
     return (rc);

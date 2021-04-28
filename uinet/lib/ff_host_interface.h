@@ -35,7 +35,7 @@ typedef intptr_t uhi_tls_key_t;
 struct uhi_thread_start_args {
 #define UHI_THREAD_NAME_SIZE	32
 	char name[UHI_THREAD_NAME_SIZE];
-	void (*start_routine)(void *);
+	void *(*start_routine)(void *);
 	void *start_routine_arg;
 	void (*end_routine)(struct uhi_thread_start_args *);
 	void (*start_notify_routine)(void *);
@@ -150,6 +150,7 @@ int   _uhi_rwlock_tryupgrade(uhi_rwlock_t *rw, void *l, const char *file, int li
 void  _uhi_rwlock_downgrade(uhi_rwlock_t *rw, void *l, const char *file, int line);
 int _uhi_rwlock_wowned(uhi_rwlock_t *rw);
 
+int sched_yield(void);
 
 int usp_pthread_create(char *name, pthread_t *thread, const pthread_attr_t *attr,
                           void *(*start_routine) (void *), void *arg);

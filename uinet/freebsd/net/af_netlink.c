@@ -116,6 +116,12 @@ struct ifa_msghdrl32 {
 };
 #endif /* COMPAT_FREEBSD32 */
 
+
+struct netlinkpcb *netlink_pcblookup(struct netlinkpcbinfo *pcbinfo,uint32_t pid);
+int ff_sleep(uint32_t secs);
+int ff_msleep(uint32_t msecs);
+
+
 MALLOC_DEFINE(M_RTABLE1, "routetbl", "routing tables");
 
 /* NB: these are not modified */
@@ -491,7 +497,7 @@ static int netlink_insert(struct netlinkpcb *nlpcb, uint32_t pid)
 {
 	int err = EADDRINUSE;
 
-	if(netlink_pcblookup(&netlinkpcbinfo[nlpcb->nlp_proto].hashbase, pid) )
+	if(netlink_pcblookup(&netlinkpcbinfo[nlpcb->nlp_proto], pid) )
 		return err;
 
 	err = EBUSY;
@@ -982,7 +988,7 @@ int netlink_broadcast(struct socket *so, struct mbuf *m, uint32_t pid,
 }
 
 
-static int nlmsg_multicast_task(struct sock *sk, struct sk_buff *skb,
+static int nlmsg_multicast_task(struct sock *sk, struct mbuf *m,
 				  unsigned int portid, unsigned int group, int flags)
 {
 	int err;
@@ -990,7 +996,7 @@ static int nlmsg_multicast_task(struct sock *sk, struct sk_buff *skb,
 	//NETLINK_CB(skb).dst_group = group;
 
 	//err = netlink_broadcast_task(sk, skb, portid, group, flags);
-	err = netlink_broadcast(sk, skb, portid, group, flags);
+	err = netlink_broadcast((struct socket *)sk, m, portid, group, flags);
 	if (err > 0)
 		err = 0;
 
@@ -1173,7 +1179,7 @@ do_again:
              {
     			int err2;
 
-    			err2 = nlmsg_unicast(msg->sk, msg->skb, msg->pid);
+    			err2 = nlmsg_unicast((struct socket *)msg->sk, msg->skb, msg->pid);
     			if (!err || err == -ESRCH)
     				err = err2;
     		}
@@ -1203,7 +1209,7 @@ do_again:
     	}
 	}
     
-	return err;
+	return;
 }
 
 

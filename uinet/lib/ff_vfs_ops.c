@@ -44,14 +44,14 @@
 #include <sys/file.h>
 #include <sys/capsicum.h>
 
-void
-NDFREE(struct nameidata *ndp, const u_int flags)
+int linux_open(const char *pathname, int flags, mode_t mode);
+
+void NDFREE(struct nameidata *ndp, const u_int flags)
 {
 
 }
 
-int
-vn_open(struct nameidata *ndp, int *flagp, int cmode, struct file *fp)
+int vn_open(struct nameidata *ndp, int *flagp, int cmode, struct file *fp)
 {
 	int fd = linux_open(ndp->ni_dirp,*flagp,cmode);
 	fp->real_fd = fd;
@@ -65,8 +65,7 @@ vn_open(struct nameidata *ndp, int *flagp, int cmode, struct file *fp)
 }
 
 
-int
-vn_close(struct vnode *vp,
+int vn_close(struct vnode *vp,
         int flags, struct ucred *file_cred, struct thread *td)
 {
     panic("vn_close not implemented");
@@ -75,8 +74,7 @@ vn_close(struct vnode *vp,
 }
 
 
-int
-vn_rdwr(enum uio_rw rw, struct vnode *vp, void *base,
+int vn_rdwr(enum uio_rw rw, struct vnode *vp, void *base,
         int len, off_t offset, enum uio_seg segflg, int ioflg,
         struct ucred *active_cred, struct ucred *file_cred, ssize_t *aresid,
         struct thread *td)
@@ -86,16 +84,14 @@ vn_rdwr(enum uio_rw rw, struct vnode *vp, void *base,
     return (0);
 }
 
-int
-vn_fill_kinfo_vnode(struct vnode *vp, struct kinfo_file *kif)
+int vn_fill_kinfo_vnode(struct vnode *vp, struct kinfo_file *kif)
 {
     panic("vn_fill_kinfo_vnode not implemented");
 
     return (0);
 }
 
-void
-NDINIT_ALL(struct nameidata *ndp, u_long op, u_long flags, enum uio_seg segflg,
+void NDINIT_ALL(struct nameidata *ndp, u_long op, u_long flags, enum uio_seg segflg,
     const char *namep, int dirfd, struct vnode *startdir, cap_rights_t *rightsp,
     struct thread *td)
 {

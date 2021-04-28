@@ -345,10 +345,10 @@ void uma_large_free(uma_slab_t slab);
 #define	KEG_LOCK_INIT(k, lc)					\
 	do {							\
 		if ((lc))					\
-			mtx_init(&(k)->uk_lock, (k)->uk_name,	\
+			mtx_init((struct mtx *)&(k)->uk_lock, (k)->uk_name,	\
 			    (k)->uk_name, MTX_DEF | MTX_DUPOK);	\
 		else						\
-			mtx_init(&(k)->uk_lock, (k)->uk_name,	\
+			mtx_init((struct mtx *)&(k)->uk_lock, (k)->uk_name,	\
 			    "UMA zone", MTX_DEF | MTX_DUPOK);	\
 	} while (0)
 
@@ -359,10 +359,10 @@ void uma_large_free(uma_slab_t slab);
 #define	ZONE_LOCK_INIT(z, lc)					\
 	do {							\
 		if ((lc))					\
-			mtx_init(&(z)->uz_lock, (z)->uz_name,	\
+			mtx_init((struct mtx *)&(z)->uz_lock, (z)->uz_name,	\
 			    (z)->uz_name, MTX_DEF | MTX_DUPOK);	\
 		else						\
-			mtx_init(&(z)->uz_lock, (z)->uz_name,	\
+			mtx_init((struct mtx *)&(z)->uz_lock, (z)->uz_name,	\
 			    "UMA zone", MTX_DEF | MTX_DUPOK);	\
 	} while (0)
 	    

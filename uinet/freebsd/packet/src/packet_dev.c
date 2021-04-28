@@ -70,6 +70,8 @@ extern struct list_head ptype_all;	/* Taps */
 int32_t gPacketDebug=0;
 #define packetPrintf(lvl, _x)	{ if ( lvl & gPacketDebug ) printf _x;}
 #endif
+void packet_notify(int event, struct packet_dev *dev);
+int packet_dev_del(struct packet_dev *dev);
 
 static int packetRcv(struct mbuf *m,
 		     struct packet_dev *dev,
@@ -745,7 +747,7 @@ int32_t packetDevShow()
 	dev = (struct packet_dev *)avl_first (&gPacketDevInfo.devTbl);
 	while(dev != NULL)
 	{
-		printf("unit:%#lx, up:%s\r\n", dev->ifIndex, dev->up?"True":"False");
+		printf("unit:%d, up:%s\r\n", dev->ifIndex, dev->up?"True":"False");
 		
 		printf("mac: %02x:%02x:%02x:%02x:%02x:%02x \r\n", 
 		dev->addr[0],dev->addr[1],dev->addr[2],dev->addr[3],dev->addr[4],dev->addr[5]);
@@ -755,13 +757,13 @@ int32_t packetDevShow()
 
 	list_for_each_entry(pt, &ptype_all, node)
 	{
-		printf("pt->dev=%#x,pt->type=%#x,pt->func=%#x\r\n",pt->dev,pt->type,pt->func);
+		printf("pt->dev=%p,pt->type=%#x,pt->func=%p\r\n",pt->dev,pt->type,pt->func);
 	}
 	for(i=0;i<PTYPE_HASH_SIZE;i++)
 	{
 		list_for_each_entry(pt, &ptype_base[i & PTYPE_HASH_MASK], node)
 		{
-			printf("pt->dev=%#x,pt->type=%#x,pt->func=%#x\r\n",pt->dev,pt->type,pt->func);
+			printf("pt->dev=%p,pt->type=%#x,pt->func=%p\r\n",pt->dev,pt->type,pt->func);
 		}
 	}
 

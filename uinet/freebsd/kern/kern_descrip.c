@@ -111,6 +111,13 @@ static void	fdunused(struct filedesc *fdp, int fd);
 static void	fdused(struct filedesc *fdp, int fd);
 static int	getmaxfd(struct thread *td);
 
+
+int read(int fd, void *buf, size_t count);
+int write(int fd, const void *buf, size_t count);
+int close(int fd);
+int ioctl(int fd, unsigned long request, ...);
+
+
 /*
  * Each process has:
  *

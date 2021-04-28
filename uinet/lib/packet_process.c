@@ -24,12 +24,13 @@ int packet_debug = 0;
 
 int ff_veth_input(const char *pkt, int len, int port);
 void handle_msg(struct ff_msg *msg, uint16_t proc_id);
+void ff_thread_set_name(const char *name);
 
 long vm_max_kernel_address;
 
 
 
-int set_port_mac(char *machex, char *macstr)
+int set_port_mac(char *machex,const char *macstr)
 {
 	sscanf(macstr,"%02x:%02x:%02x:%02x:%02x:%02x",
 		(unsigned int *)&machex[0],

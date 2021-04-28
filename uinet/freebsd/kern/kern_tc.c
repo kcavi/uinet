@@ -35,6 +35,8 @@ __FBSDID("$FreeBSD$");
 #include <sys/timex.h>
 #include <sys/vdso.h>
 
+void ntp_update_second(int64_t *adjustment, time_t *newsec);
+
 /*
  * A large step happens on boot.  This constant detects such steps.
  * It is relatively small so that ntp_update_second gets called enough

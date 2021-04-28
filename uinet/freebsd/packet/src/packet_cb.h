@@ -453,6 +453,11 @@ extern void packet_pcbdetach (struct packetpcb *);
 extern void packet_pcbdisconnect (struct packetpcb *);
 extern void packet_pcbinshash (struct packetpcb *);
 extern void packet_pcbrehash (struct packetpcb *);
+int dev_add_pack(struct packet_type *pt);
+int dev_remove_pack(struct packet_type *pt);
+void packet_dev_put(struct packet_dev *dev);
+
+
 
 #ifdef __cplusplus
 }

@@ -90,6 +90,11 @@ static int devfs_dotimes;
 SYSCTL_INT(_vfs_devfs, OID_AUTO, dotimes, CTLFLAG_RW,
     &devfs_dotimes, 0, "Update timestamps on DEVFS with default precision");
 
+void vfs_timestamp(struct timespec *tsp);
+void vgone(struct vnode *vp);
+void vput(struct vnode *vp);
+
+
 
 void
 foffset_lock_uio(struct file *fp, struct uio *uio, int flags)

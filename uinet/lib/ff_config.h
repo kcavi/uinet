@@ -130,7 +130,7 @@ struct ff_config {
 extern struct ff_config ff_global_cfg;
 
 int ff_load_config(int argc, char * const argv[]);
-int set_port_mac(char *machex, char *macstr);
+int set_port_mac(char *machex, const char *macstr);
 
 
 #ifdef __cplusplus

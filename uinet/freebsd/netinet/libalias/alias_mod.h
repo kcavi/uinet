@@ -39,11 +39,14 @@ MALLOC_DECLARE(M_ALIAS);
 
 /* Use kernel allocator. */
 #if defined(_SYS_MALLOC_H_)
-#define	malloc(x)	malloc(x, M_ALIAS, M_NOWAIT|M_ZERO)
-#define	calloc(x, n)	malloc(x*n)
-#define	free(x)		free(x, M_ALIAS)
+#undef malloc
+#define	malloc(x)	freebsd_malloc(x, M_ALIAS, M_NOWAIT|M_ZERO)
+
+#undef free
+#define	free(x)		freebsd_free(x, M_ALIAS)
 #endif
 #endif
+
 
 /* Packet flow direction flags. */
 #define IN	0x0001

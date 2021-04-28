@@ -32,8 +32,8 @@ struct netlinkpcb {
 	uint32_t		nlp_flags;
 	uint32_t		nlp_subscriptions;
 	uint32_t		nlp_ngroups;
-	uint32_t		*nlp_groups;
-	uint32_t		nlp_state;
+	unsigned long		*nlp_groups;
+	unsigned long		nlp_state;
 	/*wait_queue_head_t	nlp_wait;*/
 	struct netlink_callback	*nlp_cb;
 	void			(*nlp_datarcv)(struct mbuf *m);

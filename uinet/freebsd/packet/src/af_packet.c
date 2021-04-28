@@ -45,6 +45,7 @@ DESCRIPTION
 #include <net/if.h>
 #include <net/if_var.h>
 
+#include <machine/stdarg.h>
 
 
 
@@ -55,6 +56,7 @@ DESCRIPTION
 
 static void packet_dev_mclist(struct packet_dev *dev, struct packet_mclist *i, int what);
 extern struct packet_dev *packet_dev_get(uint32_t ifIndex);
+int packetDevInit(int autoLoadPort);
 
 int	_packetSwIndex;
 
@@ -187,7 +189,7 @@ void packet_rcv(struct ifnet *ifp, struct mbuf *m)
 	struct packet_type *pt,*lastpt=NULL;
 	struct mbuf * copym;
 	
-	struct ether_header *eth = m->m_data;
+	struct ether_header *eth = (struct ether_header *)m->m_data;
 	uint16_t type = eth->ether_type; 
 
 	list_for_each_entry(pt, &ptype_base[ntohs(type) & PTYPE_HASH_MASK], node)
@@ -197,7 +199,7 @@ void packet_rcv(struct ifnet *ifp, struct mbuf *m)
 
 		copym = m_copy(m, 0, (int)M_COPYALL);
 
-		pt->func(copym, ifp, pt, NULL);
+		pt->func(copym, pt->dev, pt, NULL);
 		
 	}	
 
@@ -205,13 +207,14 @@ void packet_rcv(struct ifnet *ifp, struct mbuf *m)
 
 
 extern int32_t gPacketDebug;
-static int packet_input(struct mbuf *m,struct packet_dev *dev,struct packet_type *pt,LL_HDR_INFO *llHdr)
+static int packet_input(struct mbuf *m,struct packet_dev *dev,struct packet_type *pt,void *arg)
 {
 	struct packetpcb *inp;
 	struct socket *last = 0;
 	struct sockaddr_ll sll;
 	struct  mbuf *opts = NULL;
 	int ret=0;
+	LL_HDR_INFO *llHdr = (LL_HDR_INFO *)arg;
 
 	inp = pt->af_packet_priv;
 
@@ -292,7 +295,7 @@ static int packet_input(struct mbuf *m,struct packet_dev *dev,struct packet_type
 }
 
 
-static int packet_input_spkt(struct mbuf *m,struct packet_dev *dev,struct packet_type *pt,int dataOffset)
+static int packet_input_spkt(struct mbuf *m,struct packet_dev *dev,struct packet_type *pt,void *dataOffset)
 {
 #if 0
 	struct socket *sk;
@@ -693,7 +696,7 @@ ring_is_full:
 
 
 
-int packet_output(struct socket *so,register struct mbuf *m,struct sockaddr *dst,struct mbuf *control,struct proc *p)
+int packet_output(struct socket *so,register struct mbuf *m,struct sockaddr *dst,struct mbuf *control)
 {
 	struct packetpcb *inp = sotoppcb(so);
 	int s,error = 0;
@@ -759,6 +762,21 @@ release:
 	//	packet_dev_put(dev);
 	m_freem(m);
 	return (error);
+}
+
+
+int _packet_output(struct mbuf *m, struct socket *so, ...)
+{
+    struct sockaddr *dst = NULL;
+    struct mbuf *control = NULL;
+    va_list ap;
+
+    va_start(ap, so);
+	dst = va_arg(ap, struct sockaddr *);
+	control = va_arg(ap, struct mbuf *);
+	va_end(ap);
+
+    return packet_output(so, m, dst, control);
 }
 
 
@@ -1278,7 +1296,7 @@ static int packet_mc_drop(struct packetpcb *pcb, struct packet_mreq_max *mreq)
 
 	/*rtnl_lock();*/
 
-	for (mlp = pcb->pp_mclist; (ml = *mlp) != NULL; mlp = &ml->next) {
+	for (mlp = &pcb->pp_mclist; (ml = *mlp) != NULL; mlp = &ml->next) {
 		if (ml->ifindex == mreq->mr_ifindex &&
 		    ml->type == mreq->mr_type &&
 		    ml->alen == mreq->mr_alen &&
@@ -1835,7 +1853,7 @@ packet_control(so, cmd, data, dev)
 	return 0;
 }
 
-static int packet_attach(struct socket *so, int proto, struct proc *p)
+static int packet_attach(struct socket *so, int proto, struct thread *p)
 {
 	struct packetpcb *inp = sotoppcb(so);
 	int error = 0;
@@ -1873,14 +1891,14 @@ static int packet_attach(struct socket *so, int proto, struct proc *p)
 	return error;
 }
 
-static int packet_detach(struct socket *so)
+static void packet_detach(struct socket *so)
 {
 	struct packetpcb *inp = sotoppcb(so);
 
 	if (inp == NULL)
 	{
 		panic("packet_detach");
-		return EINVAL;
+		return;
 	}
 	
 	/*
@@ -1898,11 +1916,11 @@ static int packet_detach(struct socket *so)
 	}
 	packet_pcbdetach(inp);
 
-	return 0;
+	return;
 }
 
 
-static int packet_bind(struct socket *so, struct sockaddr *nam, struct proc *p)
+static int packet_bind(struct socket *so, struct sockaddr *nam, struct thread *p)
 {
 	struct packetpcb *inp = sotoppcb(so);
 	int s, error,proto;
@@ -1959,7 +1977,7 @@ static int packet_listen(struct socket *so, struct proc *p)
 	return EOPNOTSUPP;
 }
 
-static int packet_connect(struct socket *so, struct sockaddr *nam, struct proc *p)
+static int packet_connect(struct socket *so, struct sockaddr *nam, struct thread *p)
 {
 	return EOPNOTSUPP;
 }
@@ -2014,7 +2032,7 @@ static int packet_shutdown(struct socket *so)
 
 
 static int packet_send(struct socket *so, int flags, struct mbuf *m, struct sockaddr *addr,
-	    struct mbuf *control, struct proc *p)
+	    struct mbuf *control, struct thread *p)
 {
 	struct packetpcb *inp = sotoppcb(so);
 	int error = 0;
@@ -2024,7 +2042,7 @@ static int packet_send(struct socket *so, int flags, struct mbuf *m, struct sock
 		return EINVAL;
 	}
 
-	error = packet_output(so, m, addr, control, p);
+	error = packet_output(so, m, addr, control);
 
 	if (control)
 		m_freem(control);		/* XXX */
@@ -2044,16 +2062,16 @@ static int packet_notsupp(struct socket *so, struct mbuf *m, int flags)
 	return EOPNOTSUPP;
 }
 
-static int packet_abort(struct socket *so)
+static void packet_abort(struct socket *so)
 {
 	struct packetpcb *inp = sotoppcb(so);
 	int s;
 
 	if (inp == 0)
-		return EINVAL;	/* ??? possible? panic instead? */
+		return;	/* ??? possible? panic instead? */
 	soisdisconnected(so);
 	packet_pcbdetach(inp);
-	return 0;
+	return;
 }
 
 static int _packet_setsockaddr(struct socket *so, struct sockaddr *nam)
@@ -2100,7 +2118,7 @@ static int packet_setsockaddr(struct socket *so, struct sockaddr **nam)
 	if (sll == NULL)
 		return (ENOBUFS);
 	bzero(sll, sizeof(*sll));
-	if(_packet_setsockaddr(so, sll))
+	if(_packet_setsockaddr(so, (struct sockaddr *)sll))
 	{
 		//DS_FREE(sll,2);
 		return ECONNRESET;
@@ -2142,119 +2160,6 @@ static unsigned int packet_poll(struct socket *so, int events, struct ucred *cre
 
 
 
-/*ARGSUSED*/
-int
-packet_usrreq(so, req, m, nam, control)
-	struct socket *so;
-	int req;
-	struct mbuf *m, *nam, *control;
-{
-	int error = 0;
-	struct packetpcb *inp = sotoppcb(so);
-	struct sockaddr_ll *sll;
-
-	if (req == PRU_CONTROL)
-		return (packet_control(so, (u_long)m, (caddr_t)nam,
-                    (struct packet_dev *)control));
-
-	switch (req) {
-
-	case PRU_ATTACH:
-		error = packet_attach(so, (int32_t)nam, 0);
-		break;
-	case PRU_DETACH:
-		error = packet_detach(so);
-		break;
-	case PRU_BIND:
-		sll = mtod(nam, struct sockaddr_ll *);
-
-		if (nam->m_len != sizeof(struct sockaddr_ll))
-		{
-			error = EINVAL;
-			break;
-		}
-		
-		error = packet_bind(so, (struct sockaddr *)sll, 0);
-		break;
-	case PRU_LISTEN:
-		error = packet_listen(so, 0);
-		break;
-	case PRU_CONNECT:
-	case PRU_CONNECT2:
-		sll = mtod(nam, struct sockaddr_ll *);
-
-		if (nam->m_len != sizeof(struct sockaddr_ll))
-		{
-			error = EINVAL;
-			break;
-		}
-	    error = packet_connect(so, (struct sockaddr *)sll, 0);
-		break;
-	case PRU_ACCEPT:
-		error = packet_accept(so, (struct sockaddr *)nam);
-		break;
-	case PRU_DISCONNECT:
-		error = packet_disconnect(so);
-		break;
-	case PRU_SHUTDOWN:
-		error = packet_shutdown(so);
-		break;
-
-	/*
-	 * Ship a packet out.  The appropriate raw output
-	 * routine handles any massaging necessary.
-	 */
-	case PRU_SEND:
-		if(nam != NULL)
-		{
-			sll = mtod(nam, struct sockaddr_ll *);
-			if (nam->m_len != sizeof(struct sockaddr_ll))
-				sll = NULL;
-		}
-		else
-			sll = NULL;
-		error = packet_send(so, 0, m, (struct sockaddr *)sll, control, 0);
-		m = NULL;
-		break;
-	case PRU_SENSE:
-	{
-		/*
-		 * stat: don't bother with a blocksize.
-		 */
-		//struct stat sb;
-		//return packet_sense_null(so, &sb);
-	}
-		break;
-
-	/*
-	 * Not supported.
-	 */
-	case PRU_RCVOOB:
-	case PRU_RCVD:
-	case PRU_SENDOOB:
-		error = packet_notsupp(so, m, control);
-		break;
-	case PRU_ABORT:
-		error = packet_abort(so);
-		break;
-	case PRU_SOCKADDR:
-		sll = mtod(nam, struct sockaddr_ll *);
-		error = _packet_setsockaddr(so, (struct sockaddr *)sll);
-		break;
-	case PRU_PEERADDR:
-		error = EOPNOTSUPP;
-		break;
-
-	default:
-		panic("packet_usrreq");
-	}
-	if (m != NULL)
-		m_freem(m);
-
-	return (error);
-}
-
-
 struct pr_usrreqs packet_usrreqs = {
 	.pru_abort =		packet_abort,
 	.pru_attach =		packet_attach,
@@ -2276,7 +2181,7 @@ struct pr_usrreqs packet_usrreqs = {
 struct protosw 	packetsw [] = {
 {
 	.pr_type =		SOCK_DGRAM,
-	.pr_domain =		&packetsw,
+	.pr_domain =		&packetdomain,
 	.pr_protocol =		0,
 	.pr_flags =		PR_ATOMIC|PR_ADDR,
 	.pr_input =		NULL,
@@ -2287,7 +2192,7 @@ struct protosw 	packetsw [] = {
 },
 {
 	.pr_type =		SOCK_RAW,
-	.pr_domain =		&packetsw,
+	.pr_domain =		&packetdomain,
 	.pr_protocol =		0,
 	.pr_flags = 	PR_ATOMIC|PR_ADDR,
 	.pr_input = 	NULL,
@@ -2320,7 +2225,7 @@ STATUS packetRawInit (void)
 	pProtoSwitch->pr_protocol   =  0;
 	pProtoSwitch->pr_flags	=  PR_ATOMIC | PR_ADDR;
 	pProtoSwitch->pr_input	=  0;
-	pProtoSwitch->pr_output	=  packet_output;
+	pProtoSwitch->pr_output	=  _packet_output;
 	pProtoSwitch->pr_ctlinput	=  packet_ctlinput;
 	pProtoSwitch->pr_ctloutput	=  packet_ctloutput2;
 	pProtoSwitch->pr_usrreqs	=  &packet_usrreqs;
@@ -2351,7 +2256,7 @@ STATUS packetDgramInit (void)
 	pProtoSwitch->pr_protocol   =  0;
 	pProtoSwitch->pr_flags	=  PR_ATOMIC | PR_ADDR;
 	pProtoSwitch->pr_input	=  0;
-	pProtoSwitch->pr_output	=  packet_output;
+	pProtoSwitch->pr_output	=  _packet_output;
 	pProtoSwitch->pr_ctlinput	=  packet_ctlinput; 
 
 	pProtoSwitch->pr_ctloutput	=  packet_ctloutput2;
@@ -2409,7 +2314,7 @@ void afSocketBufStatsShow(void)
 	
 	list_for_each_entry(pp, &packetpcbinfo.listhead, pp_list)
 	{
-		printf("packet socket : sb_lowat=%d,sb_mb=%#x,sbspace(so_rcv)=%d,sb_hiwat=%d,sbspace(so_snd)=%d,sb_hiwat=%d\n\r",
+		printf("packet socket : sb_lowat=%d,sb_mb=%p,sbspace(so_rcv)=%ld,sb_hiwat=%d,sbspace(so_snd)=%ld,sb_hiwat=%d\n\r",
 				pp->pp_socket->so_rcv.sb_lowat,pp->pp_socket->so_rcv.sb_mb,
 				sbspace(&pp->pp_socket->so_rcv),pp->pp_socket->so_rcv.sb_hiwat,sbspace(&pp->pp_socket->so_snd),pp->pp_socket->so_snd.sb_hiwat);		
 	}
