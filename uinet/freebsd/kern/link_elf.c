@@ -410,11 +410,9 @@ link_elf_init(void* arg)
 
 	ef = (elf_file_t) linker_kernel_file;
 	ef->preloaded = 1;
-#ifdef __powerpc__
-	ef->address = (caddr_t) (__startkernel - KERNBASE);
-#else
+
 	ef->address = 0;
-#endif
+
 #ifdef SPARSE_MAPPING
 	ef->object = 0;
 #endif
@@ -422,7 +420,7 @@ link_elf_init(void* arg)
 
 	if (dp != NULL)
 		parse_dynamic(ef);
-	linker_kernel_file->address += KERNBASE;
+	linker_kernel_file->address += 0;
 	linker_kernel_file->size = -(intptr_t)linker_kernel_file->address;
 
 	if (modptr != NULL) {

@@ -583,7 +583,7 @@ fail_point_eval_nontrivial(struct fail_point *fp, int *return_value)
 		case FAIL_POINT_BREAK:
 			printf("fail point %s breaking to debugger\n",
 			        fp->fp_name);
-			breakpoint();
+			//breakpoint();
 			break;
 
 		case FAIL_POINT_PRINT:

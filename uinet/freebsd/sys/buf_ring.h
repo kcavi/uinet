@@ -80,7 +80,7 @@ buf_ring_enqueue(struct buf_ring *br, void *buf)
 		cons_tail = br->br_cons_tail;
 
 		if (prod_next == cons_tail) {
-			rmb();
+			//rmb();
 			if (prod_head == br->br_prod_head &&
 			    cons_tail == br->br_cons_tail) {
 				br->br_drops++;
@@ -100,9 +100,12 @@ buf_ring_enqueue(struct buf_ring *br, void *buf)
 	 * If there are other enqueues in progress
 	 * that preceded us, we need to wait for them
 	 * to complete 
-	 */   
+	 */  
+	 
+	/*
 	while (br->br_prod_tail != prod_head)
 		cpu_spinwait();
+	*/
 	atomic_store_rel_int(&br->br_prod_tail, prod_next);
 	critical_exit();
 	return (0);

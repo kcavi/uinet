@@ -67,7 +67,7 @@ biofinish(struct bio *bp, void *stat, int error)
 void
 vfs_timestamp(struct timespec *tsp)
 {
-	printf("%s %d\n",__func__,__LINE__);
+	//printf("%s %d\n",__func__,__LINE__);
 
 }
 

@@ -2446,7 +2446,7 @@ finit(struct file *fp, u_int flag, short type, void *data, struct fileops *ops)
 	fp->f_data = data;
 	fp->f_flag = flag;
 	fp->f_type = type;
-	atomic_store_rel_ptr((volatile uintptr_t *)&fp->f_ops, (uintptr_t)ops);
+	atomic_store_rel_ptr((volatile u_long *)&fp->f_ops, (uintptr_t)ops);
 }
 
 int

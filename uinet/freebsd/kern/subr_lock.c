@@ -124,9 +124,11 @@ lock_delay(struct lock_delay_arg *la)
 	min = lc->min;
 	if (backoff < min)
 		backoff = min;
+	/*
 	for (i = 0; i < backoff; i++)
 		cpu_spinwait();
-
+	*/
+	
 	la->delay = delay;
 	la->spin_cnt += backoff;
 }

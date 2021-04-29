@@ -91,7 +91,7 @@ ptydev_fdopen(struct cdev *dev, int fflags, struct thread *td, struct file *fp)
 	int error;
 	char name[6]; /* "ttyXX" */
 
-	if (!atomic_cmpset_ptr((uintptr_t *)&dev->si_drv1, 0, 1))
+	if (!atomic_cmpset_ptr((volatile u_long *)&dev->si_drv1, 0, 1))
 		return (EBUSY);
 
 	/* Generate device name and create PTY. */

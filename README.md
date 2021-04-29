@@ -5,8 +5,8 @@ userspace netstack basic freebsd
 基于f-stack的修改，源码来自freebsd11，整合多线程模式
 
 编译方法：
-直接执行make
-默认的ARCH为x86_64，需要修改可以更改lib/machine_include/machine
+直接在uinet目录执行make
+
 
 运行方法：
 ./example/helloworld -i ens38

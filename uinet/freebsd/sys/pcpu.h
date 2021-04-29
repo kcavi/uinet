@@ -180,13 +180,6 @@ struct pcpu {
 	PCPU_MD_FIELDS;
 } __aligned(CACHE_LINE_SIZE);
 
-#ifdef CTASSERT
-/*
- * To minimize memory waste in per-cpu UMA zones, size of struct pcpu
- * should be denominator of PAGE_SIZE.
- */
-CTASSERT((PAGE_SIZE / sizeof(struct pcpu)) * sizeof(struct pcpu) == PAGE_SIZE);
-#endif
 
 #ifdef _KERNEL
 

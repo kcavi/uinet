@@ -544,7 +544,7 @@ ff_mmap(void *addr, uint64_t len, int prot, int flags, int fd, uint64_t offset)
 
     void *ret = (mmap(addr, len, host_prot, host_flags, fd, offset));
 
-    if ((uint64_t)ret == -1) {
+    if (ret == (void *) -1) {
         printf("fst mmap failed:%s\n", strerror(errno));
         exit(1);
     }
