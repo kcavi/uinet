@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -8,14 +7,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
-
-
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <linux/if_packet.h>
 #include <linux/if_arp.h>
-
 #include <errno.h>
 #include <assert.h>
 #include <pthread.h>
@@ -38,18 +33,18 @@ int sockfd;
 
 char html[] = 
 "HTTP/1.1 200 OK\r\n"
-"Server: F-Stack\r\n"
-"Date: Sat, 25 Feb 2017 09:26:33 GMT\r\n"
+"Server: UINET\r\n"
+"Date: Sat, 25 Feb 2021 09:26:33 GMT\r\n"
 "Content-Type: text/html\r\n"
-"Content-Length: 439\r\n"
-"Last-Modified: Tue, 21 Feb 2017 09:44:03 GMT\r\n"
+"Content-Length: 438\r\n"
+"Last-Modified: Tue, 21 Feb 2021 09:44:03 GMT\r\n"
 "Connection: keep-alive\r\n"
 "Accept-Ranges: bytes\r\n"
 "\r\n"
 "<!DOCTYPE html>\r\n"
 "<html>\r\n"
 "<head>\r\n"
-"<title>Welcome to F-Stack!</title>\r\n"
+"<title>Welcome to UINET!</title>\r\n"
 "<style>\r\n"
 "    body {  \r\n"
 "        width: 35em;\r\n"
@@ -59,12 +54,12 @@ char html[] =
 "</style>\r\n"
 "</head>\r\n"
 "<body>\r\n"
-"<h1>Welcome to F-Stack!</h1>\r\n"
+"<h1>Welcome to UINET!</h1>\r\n"
 "\r\n"
 "<p>For online documentation and support please refer to\r\n"
-"<a href=\"http://F-Stack.org/\">F-Stack.org</a>.<br/>\r\n"
+"<a href=\"https://github.com/kcavi/uinet\">UINET</a>.<br/>\r\n"
 "\r\n"
-"<p><em>Thank you for using F-Stack.</em></p>\r\n"
+"<p><em>Thank you for using UINET.</em></p>\r\n"
 "</body>\r\n"
 "</html>";
 
@@ -136,10 +131,10 @@ int tcp_html_select_loop(int fd)
     usp_fd_set rset;
 	int ret;
 	int clientfd = 0;
+	char buf[256];
+    int maxfd = fd; 
     USP_FD_ZERO(&rset);	
-    USP_FD_SET(fd, &rset);	
-    int maxfd=fd; 
-
+    USP_FD_SET(fd, &rset);
 
 	while (1)		 
     {	  
@@ -148,21 +143,12 @@ int tcp_html_select_loop(int fd)
 		USP_FD_ZERO(&rset);	
 		USP_FD_SET(fd, &rset);
 		maxfd=fd;
-		//printf("clientfd=%d\n",clientfd);
-		if(clientfd > 0)
-		{
-			USP_FD_SET(clientfd, &rset);
-			if(clientfd > maxfd)
-				maxfd = clientfd;
-		} 
-		//printf("%s %d\n",__func__,__LINE__);
+
 		ret=usp_select(maxfd+1,&rset,NULL,NULL,&waittime); 
-		//printf("%s %d\n",__func__,__LINE__);
 		if(ret > 0)
 		{
 			if(USP_FD_ISSET(fd,&rset))
 			{
-				//printf("%s %d\n",__func__,__LINE__);
                 int clientfd1 = usp_accept(fd, NULL, NULL);
                 if (clientfd1 < 0) 
 				{
@@ -170,30 +156,15 @@ int tcp_html_select_loop(int fd)
                     break;
                 }
 
-				//printf("%s %d\n",__func__,__LINE__);
-            	char buf[256];
             	size_t readlen = usp_read(clientfd1, buf, sizeof(buf));
 
             	usp_write(clientfd1, html, sizeof(html));
-				close(clientfd1);
+				usp_close(clientfd1);
 				
 			}
-
-			if(USP_FD_ISSET(clientfd,&rset))
-			{
-				printf("%s %d\n",__func__,__LINE__);
-            	char buf[256];
-            	size_t readlen = usp_read(clientfd, buf, sizeof(buf));
-
-            	usp_write(clientfd, html, sizeof(html));
-				//clientfd  = 0;
-				
-        	} 
     	}
 	}
 }
-
-
 
 
 int tcp_echo_select_loop(int fd)
@@ -216,16 +187,13 @@ int tcp_echo_select_loop(int fd)
 		USP_FD_ZERO(&rset);	
 		USP_FD_SET(fd, &rset);
 		maxfd=fd;
-		//printf("clientfd=%d\n",clientfd);
 		if(clientfd > 0)
 		{
 			USP_FD_SET(clientfd, &rset);
 			if(clientfd > maxfd)
 				maxfd = clientfd;
 		} 
-		//printf("%s %d\n",__func__,__LINE__);
 		ret=usp_select(maxfd+1,&rset,NULL,NULL,&waittime); 
-		//printf("%s %d\n",__func__,__LINE__);
 		if(ret > 0)
 		{
 			if(USP_FD_ISSET(fd,&rset))
@@ -239,28 +207,19 @@ int tcp_echo_select_loop(int fd)
                 }
 
 				printf("%s %d clientfd=%d\n",__func__,__LINE__,clientfd);
-            	//char buf[256];
-            	//size_t readlen = usp_read(clientfd1, buf, sizeof(buf));
-
-            	//usp_write(clientfd1, html, sizeof(html));
-				//close(clientfd1);
 				
 			}
 
 			if(USP_FD_ISSET(clientfd,&rset))
 			{
-				//printf("%s %d\n",__func__,__LINE__);
             	size_t readlen = usp_read(clientfd, buf, sizeof(buf));
-				//printf("%s %d readlen=%lu\n",__func__,__LINE__,readlen);
 				if(readlen <= 0)
 				{
 					usp_close(clientfd);
 					clientfd = 0;
 					continue;
 				}
-				//printf("buf:%s\n",buf);
             	usp_write(clientfd, buf, readlen);
-				//clientfd  = 0;
 				
         	} 
     	}
@@ -291,7 +250,6 @@ int loop_udp1(int fd)
                 printf("%02x ",buf[j]);
             printf("\n");
 			
-            //usp_write(clientfd, html, sizeof(html));
             usp_sendto(clientfd, buf, readlen,0, &from, fromlen);
         } else {
             printf("unknown event: %8.8X\n", event.flags);
@@ -303,29 +261,22 @@ int loop_udp1(int fd)
 
 int loop_udp(int fd)
 {
-   unsigned i,j;
+	unsigned i,j;
 	struct usp_sockaddr from;
 	socklen_t fromlen=sizeof(from);
-	 char buf[2560];
+	char buf[2560];
+	int readlen;
 
-    while(1)
+	while(1)
 	{
-		//printf("loop_udp start recv packets\n");
-        int readlen = usp_recvfrom(fd, buf, sizeof(buf),0, &from, &fromlen);
-		
+		readlen = usp_recvfrom(fd, buf, sizeof(buf),0, &from, &fromlen);
+
 		if(readlen <= 0)
 			continue;
 
-		//printf("loop_udp recv packet: readlen=%d\n",readlen);
-#if 0
-        for(j=0;j<readlen;j++)
-            printf("%02x ",buf[j]);
-        printf("\n");
-#endif	
-        //usp_write(clientfd, html, sizeof(html));
-        usp_sendto(fd, buf, readlen,0, &from, fromlen);
+		usp_sendto(fd, buf, readlen,0, &from, fromlen);
 	}
-}
+	}
 
 
 
@@ -356,25 +307,6 @@ void *udp_socket_test(void *arg)
         exit(1);
     }
 	
-/*
-    ret = usp_listen(sockfd, MAX_EVENTS);
-    if (ret < 0) {
-        printf("usp_listen failed\n");
-        exit(1);
-    }
-*/
-
-#if 0
-
-    EV_SET(&kevSet, sockfd, EVFILT_READ, EV_ADD, 0, MAX_EVENTS, NULL);
-
-    assert((kq = ff_kqueue()) > 0);
-
-    /* Update kqueue */
-    ff_kevent(kq, &kevSet, 1, NULL, 0, NULL);
-
-    //ff_run(loop, NULL);
-#endif
 
     while(1)
     {
@@ -449,37 +381,6 @@ void *open_test(void *arg)
 
 	ff_th_init("open_test");
 
-#if 0
-	fd = open("testfile", O_CREAT|O_RDWR, 666);
-	if (fd < 0) 
-	{
-		printf("open fd failed\n");
-		perror("error:");
-		printf("errno:%d\n",errno);
-		return NULL;
-	}
-
-
-	printf("fd:%d\n", fd);
-
-
-	printf("buf=%p,len=%d\n",buf,sizeof(buf));
-	while(1)
-	{
-		ret = read(fd,buf,sizeof(buf));
-		printf("buf:%s\n",buf);
-		printf("ret =%d\n",ret);
-		sleep(10);
-		
-	}
-
-
-
-#endif
-
-	//printf("flags=%x mode=%x\n",O_CREAT|O_RDWR,666);
-
-	
 	fd = usp_open("testfile", O_CREAT|O_RDWR, 666);
 	if (fd < 0) 
 	{
@@ -511,8 +412,6 @@ void *open_test(void *arg)
 
 int amaster;
 int aslave;
-
-
 void *pty_read_test(void *arg)
 {
 	struct usp_sockaddr from;
@@ -544,7 +443,6 @@ void *pty_read_test(void *arg)
 	{
 		memset(buf,0,sizeof(buf));
 		ret = usp_read(amaster,buf,sizeof(buf));
-		//printf("read ret =%d msg:%s\n",ret,buf);
 		if(ret < 0)
 		{
 			perror("read error:");
@@ -588,44 +486,21 @@ void *vty_main_loop(void *arg)
 		USP_FD_SET(aslave, &rset);
 		maxfd = aslave; 
 		
-	
-		printf("%s:%d,read_set:%d,write_set:%d\r\n",__func__, __LINE__,
-				USP_FD_ISSET(fd,&rset),USP_FD_ISSET(fd,&rset));
-
 		ret = usp_select(maxfd + 1,&rset,NULL,NULL,timer_wait);
 	
-		printf("%s:%d,ret=%d,read_set:%d,write_set:%d\r\n",__func__, __LINE__,
-				ret,USP_FD_ISSET(fd,&rset),USP_FD_ISSET(fd,&rset));
-
-
 		
 		if(ret > 0)
 		{
 			if(USP_FD_ISSET(aslave,&rset))
 			{
-				//printf("%s %d\n",__func__,__LINE__);
 				readlen =  usp_read(aslave,buf,sizeof(buf));
 				if(readlen <= 0)
 					continue;
-				printf("%s %d readlen=%d\n",__func__,__LINE__,readlen);
-/*
-				time2 = time(NULL);
-				if((time2 - time1) > 1)
-				{
-					printf("pty read error\n\n\n");
-					exit(-1);
-				}
-*/
-				printf("select buf:%s len:%d\n",buf,readlen);
 
 				for(i=0;i<readlen;i++)
 					printf("%02x ",buf[i]);
 
-				printf("\n\n\n\n\n\n\n");
-
-				
-
-				//printf("sockfd0 recv packet: readlen=%d\n",readlen);
+				printf("\n");
 
 				usp_write(aslave, buf, readlen);
 				
@@ -686,8 +561,6 @@ void vty_sock_serv()
 	  return;
 	}
 
-	//tcp_echo_select_loop(sockfd);
-
 	ret = usp_openpty(&amaster, &aslave,NULL);
 	if (ret < 0) 
 	{
@@ -709,10 +582,7 @@ void vty_sock_serv()
 	{
 		USP_FD_SET(fd,&rfdset);
 		USP_FD_SET(ptyfd, &rfdset);
-		printf("%s %d\n",__func__,__LINE__);
 		ret = usp_select(maxfd + 1, &rfdset, NULL, NULL, NULL);
-		printf("%s:%d,ret=%d,tty:%d,pty:%d\r\n",__func__, __LINE__,
-				ret,USP_FD_ISSET(fd,&rfdset),USP_FD_ISSET(ptyfd, &rfdset));
 		
 		if (ret <= 0)
 		{
@@ -732,7 +602,6 @@ void vty_sock_serv()
 			if(usp_write(fd, buf, bytes) < bytes)
 			{
 				printf("tcp fd write fail\n");
-				//break;
 			}
 		}
 		
@@ -797,9 +666,7 @@ void *pty_select_read_test(void *arg)
 		USP_FD_SET(amaster, &rset);
 		maxfd = amaster; 
 
-		//printf("%s %d\n",__func__,__LINE__);
 		ret=usp_select(maxfd+1,&rset,NULL,NULL,&waittime); 
-		//printf("%s %d\n",__func__,__LINE__);
 		if(ret > 0)
 		{
 			if(USP_FD_ISSET(amaster,&rset))
@@ -809,16 +676,8 @@ void *pty_select_read_test(void *arg)
 					continue;
 
 				printf("select buf:%s len:%d\n",buf,readlen);
-
 				
-
-				//printf("sockfd0 recv packet: readlen=%d\n",readlen);
-
-				//usp_sendto(sockfd0, buf, readlen,0, &from, fromlen);
-				
-			}
-
-			
+			}		
 		}
 	}
 
@@ -1090,9 +949,7 @@ void *ipv6_udp_server_test(void *arg)
 	int maxfd;
 	int readlen;
 	socklen_t addr_len;
-	
-	//ff_th_init("ipv6_udp_server");
-    
+	    
     int ipv6sockfd = usp_socket(USP_AF_INET6, USP_SOCK_DGRAM, 0);
     if (ipv6sockfd < 0) 
 	{
@@ -1106,7 +963,7 @@ void *ipv6_udp_server_test(void *arg)
 	printf("ipv6 server sockfd:%d\n", ipv6sockfd);
 
 	struct usp_sockaddr_in6 my_addr;
-#if 1
+
 	bzero(&my_addr, sizeof(my_addr));
 	my_addr.sin6_len = sizeof(my_addr);
 	my_addr.sin6_family = USP_AF_INET6;
@@ -1121,7 +978,7 @@ void *ipv6_udp_server_test(void *arg)
 		printf("errno:%d\n",errno);
 		return NULL;
 	}
-#endif
+
 #define REMOTEIP "fe80::66"	
 
 	while(1)
@@ -1132,14 +989,6 @@ void *ipv6_udp_server_test(void *arg)
 		inet_ntop(AF_INET6,&my_addr.sin6_addr,addr_rcv,sizeof(addr_rcv));  
 		printf("message from ip %s",addr_rcv);  
 		printf("Received message : %s\n",buf);
-		#if 0
-		if(usp_sendto(ipv6sockfd,buf,readlen,0,(struct usp_sockaddr *)&my_addr,addr_len)<0)  
-		{  
-			printf("error");
-		}  
-		#endif
-		//inet_pton(AF_INET6,REMOTEIP,&my_addr.sin6_addr);  
-		//printf("my_addr.sin6_addr.s6_addr[15] = %x\n", my_addr.sin6_addr.s6_addr[15]);
 		
 	}
 }
@@ -1162,7 +1011,6 @@ void *ipv6_udp_client_test(void *arg)
 	int readlen;
 	socklen_t addr_len;
 	
-	//ff_th_init("ipv6_udp_client");
     
     int ipv6sockfd = usp_socket(USP_AF_INET6, USP_SOCK_DGRAM, 0);
     if (ipv6sockfd < 0) 
@@ -1186,9 +1034,7 @@ void *ipv6_udp_client_test(void *arg)
 	my_addr.sin6_family = USP_AF_INET6;
 	my_addr.sin6_port = htons(8017);
 	//my_addr.sin6_addr = in6addr_any;
-	inet_pton(AF_INET6,LINKLOCALADDR,&my_addr.sin6_addr);
-	
-#if 1
+	inet_pton(AF_INET6,LINKLOCALADDR,&my_addr.sin6_addr);	
 
 	ret = usp_bind(ipv6sockfd, (struct usp_sockaddr *)&my_addr, sizeof(my_addr));
 	if (ret < 0) 
@@ -1198,7 +1044,7 @@ void *ipv6_udp_client_test(void *arg)
 		printf("errno:%d\n",errno);
 		return NULL;
 	}
-#endif
+
 #define REMOTEIP "fe80::66"	
 
 
@@ -1209,21 +1055,6 @@ void *ipv6_udp_client_test(void *arg)
 	{
 		readlen = usp_sendto(ipv6sockfd,msg,sizeof(msg),0,(struct usp_sockaddr *)&my_addr,sizeof(my_addr)); 
 		printf("ipv6 send len=%d\n",readlen);
-  #if 0
-		bzero(buf,sizeof(buf));  
-		readlen = usp_recvfrom(ipv6sockfd,buf,sizeof(buf),0,(struct usp_sockaddr *)&my_addr,(socklen_t*)&addr_len); 
-  
-		inet_ntop(AF_INET6,&my_addr.sin6_addr,addr_rcv,sizeof(addr_rcv));  
-		printf("message from ip %s",addr_rcv);  
-		printf("Received message : %s\n",buf);  
-		if(usp_sendto(ipv6sockfd,buf,readlen,0,(struct usp_sockaddr *)&my_addr,addr_len)<0)  
-		{  
-			printf("error");
-		}  
-	#endif
-		//inet_pton(AF_INET6,REMOTEIP,&my_addr.sin6_addr);  
-		//printf("my_addr.sin6_addr.s6_addr[15] = %x\n", my_addr.sin6_addr.s6_addr[15]);
-
 		sleep(3);
 		
 	}
@@ -1231,9 +1062,7 @@ void *ipv6_udp_client_test(void *arg)
 
 
 void *tcp_web_test(void *arg)
-{
-	//ff_th_init("tcp socket_test");
-	
+{	
 	int sockfd = usp_socket(USP_AF_INET, USP_SOCK_STREAM, 0);
     printf("tcp_web_test sockfd:%d\n", sockfd);
     if (sockfd < 0) 
@@ -1263,11 +1092,8 @@ void *tcp_web_test(void *arg)
         return NULL;
     }
 
-#if 1
 	tcp_html_select_loop(sockfd);
-#else
-	kevent_test();
-#endif
+
     return 0;
 }
 
@@ -1365,13 +1191,6 @@ void *af_packet_test(void *arg)
 		if(readlen <= 0)
 			continue;
 
-#if 1
-        for(i=0;i<readlen;i++)
-            printf("%02x ",buf[i]);
-        printf("\n");
-#endif	
-        //usp_sendto(fd, buf, readlen,0, &from, fromlen);
-        //readlen = usp_send(packetsockfd, buf, readlen,0);
 		readlen = usp_sendto(packetsockfd, buf, readlen,0, (struct usp_sockaddr *)&my_addr, sizeof(my_addr));
 
 		printf("af_packet send readlen=%d\n",readlen);
@@ -1449,9 +1268,7 @@ void *select_test(void *arg)
 		USP_FD_SET(sockfd1, &rset);	
     	maxfd = sockfd0 > sockfd1?sockfd0:sockfd1; 
 
-		//printf("%s %d\n",__func__,__LINE__);
 		ret=usp_select(maxfd+1,&rset,NULL,NULL,&waittime); 
-		//printf("%s %d\n",__func__,__LINE__);
 		if(ret > 0)
 		{
 			if(USP_FD_ISSET(sockfd0,&rset))
@@ -1460,8 +1277,6 @@ void *select_test(void *arg)
 
 				if(readlen <= 0)
 					continue;
-
-				//printf("sockfd0 recv packet: readlen=%d\n",readlen);
 
 				usp_sendto(sockfd0, buf, readlen,0, &from, fromlen);
 				
@@ -1473,8 +1288,6 @@ void *select_test(void *arg)
 
 				if(readlen <= 0)
 					continue;
-
-				//printf("sockfd1 recv packet: readlen=%d\n",readlen);
 
 				usp_sendto(sockfd1, buf, readlen,0, &from, fromlen);
         	} 
@@ -1489,6 +1302,11 @@ int main(int argc, char * argv[])
 {
 	pthread_t pid;
     ff_init(argc, argv);
+
+#if 1
+	sleep(2);
+	usp_pthread_create("tcp_web",&pid, NULL,tcp_web_test, NULL);
+#endif
 
 
 #if 0  /*af_unix udp*/
@@ -1536,10 +1354,7 @@ int main(int argc, char * argv[])
 	usp_pthread_create("ipv6_udp_client",&pid, NULL,ipv6_udp_client_test, NULL);
 #endif
 
-#if 1
-	sleep(2);
-	usp_pthread_create("tcp_web",&pid, NULL,tcp_web_test, NULL);
-#endif
+
 
 #if 0
 	sleep(2);

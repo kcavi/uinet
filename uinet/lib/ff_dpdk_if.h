@@ -29,7 +29,7 @@
 
 #include "ff_api.h"
 
-#define ff_IF_NAME "f-stack-%d"
+#define ff_IF_NAME "em%d"
 
 struct loop_routine {
     loop_func_t loop;
