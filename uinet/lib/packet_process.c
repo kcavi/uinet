@@ -354,7 +354,10 @@ int packet_sys_send(char *pkt, int len ,int port)
 	    printf("\n");
 	}
     n = send(packet_fd, pkt, len, 0);
-	return n;
+	if(n == len)
+		return 0;
+	else
+		return -1;
 }
 
 
