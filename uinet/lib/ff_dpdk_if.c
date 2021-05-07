@@ -577,7 +577,7 @@ int ff_dpdk_if_up(void)
 {
     pthread_t pid;
 	  
-    veth_ctx[0] = ff_veth_attach(&ff_global_cfg.dpdk.port_cfgs[0]);
+    veth_ctx[0] = ff_veth_attach(&ff_global_cfg.port_cfgs[0]);
 
     pthread_create(&pid,NULL,(void *)msg_loop ,NULL);
 	pthread_create(&pid,NULL,(void *)clock_task ,NULL);

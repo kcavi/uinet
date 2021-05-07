@@ -82,7 +82,6 @@ FF_HOST_SRCS+=              \
 	ff_config.c         \
 	ff_ini_parser.c     \
 	ff_dpdk_if.c        \
-	ff_dpdk_pcap.c      \
 	ff_epoll.c          \
 	ff_init.c          \
 	packet_process.c

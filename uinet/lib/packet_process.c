@@ -85,8 +85,7 @@ kick_proc0(void)
 
 
 /* split string into tokens */
-int
-rte_strsplit(char *string, int stringlen,
+int strsplit(char *string, int stringlen,
 	     char **tokens, int maxtokens, char delim)
 {
 	int i, tok = 0;
@@ -152,7 +151,7 @@ void msg_loop(void)
 	int cmdSocket;
 	int packet_len=1518;
 	int if_index=0;
-	char *device=ff_global_cfg.dpdk.packet_bind_dev;
+	char *device = ff_global_cfg.packet_bind_dev;
 	
 	unsigned int  protocol=0;
 	int count_flags=0;
@@ -207,7 +206,7 @@ void msg_loop(void)
 	if( (if_index = get_ifindex(device)) < 0)
 	{
 		printf("invalid interface\n");
-		return;
+		exit(-1);
 	}
 	
 	memset(&sock_addr,0,sizeof(sock_addr));

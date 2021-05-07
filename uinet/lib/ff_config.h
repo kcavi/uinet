@@ -72,46 +72,16 @@ struct ff_freebsd_cfg {
 
 struct ff_config {
     char *filename;
-    struct {
-        char *proc_type;
-        /* mask of enabled lcores */
-        char *lcore_mask;
-        /* mask of current proc on all lcores */
-        char *proc_mask;
+	int tso;
+	int gro;
 
-        /* specify base virtual address to map. */
-        char *base_virtaddr;
+    char *packet_bind_dev;
 
-        int nb_channel;
-        int memory;
-        int no_huge;
-        int nb_procs;
-        int proc_id;
-        int promiscuous;
-        int numa_on;
-        int tso;
-        int vlan_strip;
-
-        /* sleep x microseconds when no pkts incomming */
-        unsigned idle_sleep;
-
-        /* list of proc-lcore */
-        uint16_t *proc_lcore;
-        char *packet_bind_dev;
-
-        int nb_ports;
-        uint16_t max_portid;
-        uint16_t *portid_list;
-        // MAP(portid => struct ff_port_cfg*)
-        struct ff_port_cfg *port_cfgs;
-    } dpdk;
-
-    struct {
-        int enable;
-        char *method;
-        char *tcp_port;
-        char *udp_port;
-    } kni;
+	int nb_ports;
+	uint16_t max_portid;
+	uint16_t *portid_list;
+	
+	struct ff_port_cfg *port_cfgs;
 
     struct {
         int level;
