@@ -145,18 +145,7 @@ void dtrace_getnanotime(struct timespec *tsp);
 static int
 sysctl_kern_boottime(SYSCTL_HANDLER_ARGS)
 {
-#ifndef __mips__
-#ifdef SCTL_MASK32
-	int tv[2];
-
-	if (req->flags & SCTL_MASK32) {
-		tv[0] = boottime.tv_sec;
-		tv[1] = boottime.tv_usec;
-		return SYSCTL_OUT(req, tv, sizeof(tv));
-	} else
-#endif
-#endif
-		return SYSCTL_OUT(req, &boottime, sizeof(boottime));
+	return SYSCTL_OUT(req, &boottime, sizeof(boottime));
 }
 
 static int
@@ -1357,12 +1346,12 @@ tc_windup(void)
 
 	/* Now is a good time to change timecounters. */
 	if (th->th_counter != timecounter) {
-#ifndef __arm__
+
 		if ((timecounter->tc_flags & TC_FLAGS_C2STOP) != 0)
 			cpu_disable_c2_sleep++;
 		if ((th->th_counter->tc_flags & TC_FLAGS_C2STOP) != 0)
 			cpu_disable_c2_sleep--;
-#endif
+
 		th->th_counter = timecounter;
 		th->th_offset_count = ncount;
 		tc_min_ticktock_freq = max(1, timecounter->tc_frequency /

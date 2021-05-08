@@ -50,12 +50,6 @@
  * to leave room for a bootstrap, etc.
  */
 
-/* XXX these should be defined per controller (or drive) elsewhere, not here! */
-#if defined(__i386__) || defined(__amd64__) || defined(__arm__) || \
-    defined(__powerpc__) || defined(__mips__)
-#define LABELSECTOR	1			/* sector containing label */
-#define LABELOFFSET	0			/* offset of label in sector */
-#endif
 
 #define DISKMAGIC	((u_int32_t)0x82564557)	/* The disk magic number */
 #ifndef MAXPARTITIONS

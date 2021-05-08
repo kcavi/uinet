@@ -142,12 +142,7 @@ struct ctlname {
 /* definitions for sysctl_req 'lock' member */
 #define	REQ_UNWIRED	1
 #define	REQ_WIRED	2
-
-/* definitions for sysctl_req 'flags' member */
-#if defined(__amd64__) || defined(__powerpc64__) ||\
-    (defined(__mips__) && defined(__mips_n64))
 #define	SCTL_MASK32	1	/* 32 bit emulation */
-#endif
 
 /*
  * This describes the access space for a sysctl request.  This is needed

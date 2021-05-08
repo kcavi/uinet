@@ -190,11 +190,8 @@ buf_ring_dequeue_sc(struct buf_ring *br)
 	 *
 	 * <1> Load (on core 1) from br->br_ring[cons_head] can be reordered (speculative readed) by CPU.
 	 */	
-#if defined(__arm__) || defined(__aarch64__)
-	cons_head = atomic_load_acq_32(&br->br_cons_head);
-#else
 	cons_head = br->br_cons_head;
-#endif
+
 	prod_tail = atomic_load_acq_32(&br->br_prod_tail);
 	
 	cons_next = (cons_head + 1) & br->br_cons_mask;

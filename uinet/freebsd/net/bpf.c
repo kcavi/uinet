@@ -1283,9 +1283,7 @@ bpfioctl(struct cdev *dev, u_long cmd, caddr_t addr, int flags,
 #endif
 		case BIOCGETIF:
 		case BIOCGRTIMEOUT:
-#if defined(COMPAT_FREEBSD32) && !defined(__mips__)
-		case BIOCGRTIMEOUT32:
-#endif
+
 		case BIOCGSTATS:
 		case BIOCVERSION:
 		case BIOCGRSIG:
@@ -1295,9 +1293,6 @@ bpfioctl(struct cdev *dev, u_long cmd, caddr_t addr, int flags,
 		case FIONREAD:
 		case BIOCLOCK:
 		case BIOCSRTIMEOUT:
-#if defined(COMPAT_FREEBSD32) && !defined(__mips__)
-		case BIOCSRTIMEOUT32:
-#endif
 		case BIOCIMMEDIATE:
 		case TIOCGPGRP:
 		case BIOCROTZBUF:
@@ -1519,23 +1514,9 @@ bpfioctl(struct cdev *dev, u_long cmd, caddr_t addr, int flags,
 	 * Set read timeout.
 	 */
 	case BIOCSRTIMEOUT:
-#if defined(COMPAT_FREEBSD32) && !defined(__mips__)
-	case BIOCSRTIMEOUT32:
-#endif
 		{
 			struct timeval *tv = (struct timeval *)addr;
-#if defined(COMPAT_FREEBSD32) && !defined(__mips__)
-			struct timeval32 *tv32;
-			struct timeval tv64;
-
-			if (cmd == BIOCSRTIMEOUT32) {
-				tv32 = (struct timeval32 *)addr;
-				tv = &tv64;
-				tv->tv_sec = tv32->tv_sec;
-				tv->tv_usec = tv32->tv_usec;
-			} else
-#endif
-				tv = (struct timeval *)addr;
+			tv = (struct timeval *)addr;
 
 			/*
 			 * Subtract 1 tick from tvtohz() since this isn't
@@ -1550,30 +1531,12 @@ bpfioctl(struct cdev *dev, u_long cmd, caddr_t addr, int flags,
 	 * Get read timeout.
 	 */
 	case BIOCGRTIMEOUT:
-#if defined(COMPAT_FREEBSD32) && !defined(__mips__)
-	case BIOCGRTIMEOUT32:
-#endif
 		{
 			struct timeval *tv;
-#if defined(COMPAT_FREEBSD32) && !defined(__mips__)
-			struct timeval32 *tv32;
-			struct timeval tv64;
-
-			if (cmd == BIOCGRTIMEOUT32)
-				tv = &tv64;
-			else
-#endif
-				tv = (struct timeval *)addr;
+			tv = (struct timeval *)addr;
 
 			tv->tv_sec = d->bd_rtout / hz;
 			tv->tv_usec = (d->bd_rtout % hz) * tick;
-#if defined(COMPAT_FREEBSD32) && !defined(__mips__)
-			if (cmd == BIOCGRTIMEOUT32) {
-				tv32 = (struct timeval32 *)addr;
-				tv32->tv_sec = tv->tv_sec;
-				tv32->tv_usec = tv->tv_usec;
-			}
-#endif
 
 			break;
 		}

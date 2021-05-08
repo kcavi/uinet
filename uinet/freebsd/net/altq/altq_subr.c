@@ -71,11 +71,6 @@
 #include <sys/cpu.h>
 #include <sys/eventhandler.h>
 #include <machine/clock.h>
-#if defined(__amd64__) || defined(__i386__)
-#include <machine/cpufunc.h>		/* for pentium tsc */
-#include <machine/specialreg.h>		/* for CPUID_TSC */
-#include <machine/md_var.h>		/* for cpu_feature */
-#endif /* __amd64 || __i386__ */
 
 /*
  * internal function prototypes
@@ -896,11 +891,8 @@ int machclk_usepcc;
 u_int32_t machclk_freq;
 u_int32_t machclk_per_tick;
 
-#if defined(__i386__) && defined(__NetBSD__)
-extern u_int64_t cpu_tsc_freq;
-#endif
 
-#if (__FreeBSD_version >= 700035)
+
 /* Update TSC freq with the value indicated by the caller. */
 static void
 tsc_freq_changed(void *arg, const struct cf_level *level, int status)
@@ -909,18 +901,12 @@ tsc_freq_changed(void *arg, const struct cf_level *level, int status)
 	if (status != 0)
 		return;
 
-#if (__FreeBSD_version >= 701102) && (defined(__amd64__) || defined(__i386__))
-	/* If TSC is P-state invariant, don't do anything. */
-	if (tsc_is_invariant)
-		return;
-#endif
-
 	/* Total setting for this level gives the new frequency in MHz. */
 	init_machclk();
 }
 EVENTHANDLER_DEFINE(cpufreq_post_change, tsc_freq_changed, NULL,
     EVENTHANDLER_PRI_LAST);
-#endif /* __FreeBSD_version >= 700035 */
+
 
 static void
 init_machclk_setup(void)
@@ -931,21 +917,13 @@ init_machclk_setup(void)
 
 	machclk_usepcc = 1;
 
-#if (!defined(__amd64__) && !defined(__i386__)) || defined(ALTQ_NOPCC)
-	machclk_usepcc = 0;
-#endif
 #if defined(__FreeBSD__) && defined(SMP)
 	machclk_usepcc = 0;
 #endif
 #if defined(__NetBSD__) && defined(MULTIPROCESSOR)
 	machclk_usepcc = 0;
 #endif
-#if defined(__amd64__) || defined(__i386__)
-	/* check if TSC is available */
-	if ((cpu_feature & CPUID_TSC) == 0 ||
-	    atomic_load_acq_64(&tsc_freq) == 0)
-		machclk_usepcc = 0;
-#endif
+
 }
 
 void
@@ -968,14 +946,6 @@ init_machclk(void)
 #endif
 		return;
 	}
-
-	/*
-	 * if the clock frequency (of Pentium TSC or Alpha PCC) is
-	 * accessible, just use it.
-	 */
-#if defined(__amd64__) || defined(__i386__)
-	machclk_freq = atomic_load_acq_64(&tsc_freq);
-#endif
 
 	/*
 	 * if we don't know the clock frequency, measure it.
@@ -1005,15 +975,7 @@ init_machclk(void)
 #endif
 }
 
-#if defined(__OpenBSD__) && defined(__i386__)
-static __inline u_int64_t
-rdtsc(void)
-{
-	u_int64_t rv;
-	__asm __volatile(".byte 0x0f, 0x31" : "=A" (rv));
-	return (rv);
-}
-#endif /* __OpenBSD__ && __i386__ */
+
 
 u_int64_t
 read_machclk(void)
@@ -1021,11 +983,7 @@ read_machclk(void)
 	u_int64_t val;
 
 	if (machclk_usepcc) {
-#if defined(__amd64__) || defined(__i386__)
-		val = rdtsc();
-#else
 		panic("read_machclk");
-#endif
 	} else {
 		struct timeval tv;
 

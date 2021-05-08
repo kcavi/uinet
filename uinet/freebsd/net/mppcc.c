@@ -211,14 +211,6 @@ int MPPC_Compress(u_char **src, u_char **dst, u_long *srcCnt, u_long *dstCnt, ch
 	    continue;
 	}
 
-	/* Find length of the matching fragment */
-#if defined(__amd64__) || defined(__i386__)
-	/* Optimization for CPUs without strict data aligning requirements */
-	while ((*((uint32_t*)p) == *((uint32_t*)s)) && (s < (r - 3))) {
-	    p+=4;
-	    s+=4;
-	}
-#endif
 	while((*p++ == *s++) && (s <= r));
 	len = s - q - 1;
 	i += len;

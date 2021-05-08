@@ -84,14 +84,6 @@ __FBSDID("$FreeBSD$");
 
 #include "ifdi_if.h"
 
-#if defined(__i386__) || defined(__amd64__)
-#include <sys/memdesc.h>
-#include <machine/bus.h>
-#include <machine/md_var.h>
-#include <machine/specialreg.h>
-#include <x86/include/busdma_impl.h>
-#include <x86/iommu/busdma_dmar.h>
-#endif
 
 
 /*
@@ -1050,15 +1042,8 @@ iflib_netmap_rxq_init(if_ctx_t ctx, iflib_rxq_t rxq)
 
 #endif
 
-#if defined(__i386__) || defined(__amd64__)
-static __inline void
-prefetch(void *x)
-{
-	__asm volatile("prefetcht0 %0" :: "m" (*(unsigned long *)x));
-}
-#else
+
 #define prefetch(x)
-#endif
 
 static void
 _iflib_dmamap_cb(void *arg, bus_dma_segment_t *segs, int nseg, int err)
@@ -1307,26 +1292,6 @@ iflib_txsd_alloc(iflib_txq_t txq)
 		goto fail;
 	}
 
-        /* Create the descriptor buffer dma maps */
-#if defined(ACPI_DMAR) || (!(defined(__i386__) && !defined(__amd64__)))
-	if ((ctx->ifc_flags & IFC_DMAR) == 0)
-		return (0);
-
-	if (!(txq->ift_sds.ifsd_map =
-	    (bus_dmamap_t *) malloc(sizeof(bus_dmamap_t) * scctx->isc_ntxd[txq->ift_br_offset], M_IFLIB, M_NOWAIT | M_ZERO))) {
-		device_printf(dev, "Unable to allocate tx_buffer map memory\n");
-		err = ENOMEM;
-		goto fail;
-	}
-
-	for (int i = 0; i < scctx->isc_ntxd[txq->ift_br_offset]; i++) {
-		err = bus_dmamap_create(txq->ift_desc_tag, 0, &txq->ift_sds.ifsd_map[i]);
-		if (err != 0) {
-			device_printf(dev, "Unable to create TX DMA map\n");
-			goto fail;
-		}
-	}
-#endif
 	return (0);
 fail:
 	/* We free all, it handles case where we are in the middle */
@@ -1588,11 +1553,6 @@ _iflib_fl_refill(if_ctx_t ctx, iflib_fl_t fl, int count)
 			}
 			rxsd->ifsd_flags |= RX_SW_DESC_MAP_CREATED;
 		}
-#endif
-#if defined(__i386__) || defined(__amd64__)
-		if (!IS_DMAR(ctx)) {
-			bus_addr = pmap_kextract((vm_offset_t)cl);
-		} else
 #endif
 		{
 			struct rxq_refill_cb_arg cb_arg;

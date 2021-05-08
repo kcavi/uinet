@@ -206,12 +206,11 @@ void *linker_hwpmc_list_objects(void);
 #define MODINFOMD_SSYM		0x0003		/* start of symbols */
 #define MODINFOMD_ESYM		0x0004		/* end of symbols */
 #define MODINFOMD_DYNAMIC	0x0005		/* _DYNAMIC pointer */
-/* These values are MD on these two platforms */
-#if !defined(__sparc64__) && !defined(__powerpc__)
+
 #define MODINFOMD_ENVP		0x0006		/* envp[] */
 #define MODINFOMD_HOWTO		0x0007		/* boothowto */
 #define MODINFOMD_KERNEND	0x0008		/* kernend */
-#endif
+
 #define MODINFOMD_SHDR		0x0009		/* section header table */
 #define MODINFOMD_CTORS_ADDR	0x000a		/* address of .ctors */
 #define MODINFOMD_CTORS_SIZE	0x000b		/* size of .ctors */

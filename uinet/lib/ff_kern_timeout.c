@@ -47,9 +47,6 @@ __FBSDID("$FreeBSD$");
 
 #include "opt_callout_profiling.h"
 #include "opt_ddb.h"
-#if defined(__arm__)
-//#include "opt_timer.h"
-#endif
 #include "opt_rss.h"
 #include "opt_param.h"
 

@@ -46,9 +46,6 @@ __FBSDID("$FreeBSD$");
 #include <netinet/in.h>
 #endif
 
-#ifndef __i386__
-#define BPF_ALIGN
-#endif
 
 #ifndef BPF_ALIGN
 #define EXTRACT_SHORT(p)	((u_int16_t)ntohs(*(u_int16_t *)p))

@@ -57,20 +57,11 @@ __FBSDID("$FreeBSD$");
  * System parameter formulae.
  */
 
-#ifndef HZ
-#  if defined(__mips__) || defined(__arm__)
-#    define	HZ 100
-#  else
-#    define	HZ 1000
-#  endif
-#  ifndef HZ_VM
-#    define	HZ_VM 100
-#  endif
-#else
-#  ifndef HZ_VM
-#    define	HZ_VM HZ
-#  endif
+
+#ifndef HZ_VM
+#define	HZ_VM HZ
 #endif
+
 #define	NPROC (20 + 16 * maxusers)
 #ifndef NBUF
 #define NBUF 0
@@ -158,10 +149,6 @@ CTASSERT(nitems(vm_guest_sysctl_names) - 1 == VM_LAST);
 void
 init_param1(void)
 {
-
-#if !defined(__mips__) && !defined(__arm64__) && !defined(__sparc64__)
-	TUNABLE_INT_FETCH("kern.kstack_pages", &kstack_pages);
-#endif
 	hz = -1;
 	TUNABLE_INT_FETCH("kern.hz", &hz);
 	if (hz == -1)
