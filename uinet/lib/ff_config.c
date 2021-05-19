@@ -201,6 +201,8 @@ port_cfg_handler(struct ff_config *cfg, const char *section,
             fprintf(stderr, "parse_port_list malloc failed\n");
             return 0;
         }
+		memset(cfg->portid_list,0,sizeof(uint16_t)*MAX_ETHPORTS);
+		
         cfg->max_portid = cfg->portid_list[MAX_ETHPORTS-1];
         // initialize lcore list and nb_lcores
         int i;
