@@ -57,7 +57,7 @@
 
 #include <machine/stdarg.h>
 
-#include "usp_socket.h"
+#include "rsp_socket.h"
 #include "ff_api.h"
 #include "ff_host_interface.h"
 
@@ -393,7 +393,7 @@ linux2freebsd_opt(int level, int optname)
 }
 
 static void
-linux2freebsd_sockaddr(const struct usp_sockaddr *linux,
+linux2freebsd_sockaddr(const struct rsp_sockaddr *linux,
     socklen_t addrlen, struct sockaddr *freebsd)
 {
 #if 0
@@ -412,7 +412,7 @@ linux2freebsd_sockaddr(const struct usp_sockaddr *linux,
 }
 
 static void
-freebsd2usp_sockaddr(struct usp_sockaddr *linux,
+freebsd2rsp_sockaddr(struct rsp_sockaddr *linux,
     struct sockaddr *freebsd)
 {
 #if 0
@@ -429,7 +429,7 @@ freebsd2usp_sockaddr(struct usp_sockaddr *linux,
 }
 
 int
-usp_socket(int domain, int type, int protocol)
+rsp_socket(int domain, int type, int protocol)
 {
     int rc;
     struct socket_args sa;
@@ -451,7 +451,7 @@ kern_fail:
 }
 
 int
-usp_getsockopt(int s, int level, int optname, void *optval,
+rsp_getsockopt(int s, int level, int optname, void *optval,
     socklen_t *optlen)
 {
     int rc;
@@ -476,7 +476,7 @@ kern_fail:
 }
 
 int
-usp_getsockopt_freebsd(int s, int level, int optname,
+rsp_getsockopt_freebsd(int s, int level, int optname,
     void *optval, socklen_t *optlen)
 {
     int rc;
@@ -493,7 +493,7 @@ kern_fail:
 }
 
 int
-usp_setsockopt(int s, int level, int optname, const void *optval,
+rsp_setsockopt(int s, int level, int optname, const void *optval,
     socklen_t optlen)
 {
     int rc;
@@ -519,7 +519,7 @@ kern_fail:
 }
 
 int
-usp_setsockopt_freebsd(int s, int level, int optname,
+rsp_setsockopt_freebsd(int s, int level, int optname,
     const void *optval, socklen_t optlen)
 {
     int rc;
@@ -536,7 +536,7 @@ kern_fail:
 }
 
 int
-usp_ioctl(int fd, unsigned long request, ...)
+rsp_ioctl(int fd, unsigned long request, ...)
 {
     int rc;
     va_list ap;
@@ -563,7 +563,7 @@ kern_fail:
 }
 
 int
-usp_ioctl_freebsd(int fd, unsigned long request, ...)
+rsp_ioctl_freebsd(int fd, unsigned long request, ...)
 {
     int rc;
     va_list ap;
@@ -585,7 +585,7 @@ kern_fail:
 
 
 int
-usp_open(const char *pathname, int flags, mode_t mode)
+rsp_open(const char *pathname, int flags, mode_t mode)
 {
 	int rc;
 	if ((rc = kern_openat(curthread, AT_FDCWD, (char *)pathname, UIO_USERSPACE,
@@ -601,7 +601,7 @@ kern_fail:
 
 
 int
-usp_close(int fd)
+rsp_close(int fd)
 {
     int rc;
 
@@ -615,7 +615,7 @@ kern_fail:
 }
 
 ssize_t
-usp_read(int fd, void *buf, size_t nbytes)
+rsp_read(int fd, void *buf, size_t nbytes)
 {
     struct uio auio;
     struct iovec aiov;
@@ -643,7 +643,7 @@ kern_fail:
 }
 
 ssize_t
-usp_readv(int fd, const struct iovec *iov, int iovcnt)
+rsp_readv(int fd, const struct iovec *iov, int iovcnt)
 {
     struct uio auio;
     int rc, len, i;
@@ -667,7 +667,7 @@ kern_fail:
 }
 
 ssize_t
-usp_write(int fd, const void *buf, size_t nbytes)
+rsp_write(int fd, const void *buf, size_t nbytes)
 {
     struct uio auio;
     struct iovec aiov;
@@ -695,7 +695,7 @@ kern_fail:
 }
 
 ssize_t
-usp_writev(int fd, const struct iovec *iov, int iovcnt)
+rsp_writev(int fd, const struct iovec *iov, int iovcnt)
 {
     struct uio auio;
     int i, rc, len;
@@ -718,14 +718,14 @@ kern_fail:
 }
 
 ssize_t
-usp_send(int s, const void *buf, size_t len, int flags)
+rsp_send(int s, const void *buf, size_t len, int flags)
 {
-    return (usp_sendto(s, buf, len, flags, NULL, 0));
+    return (rsp_sendto(s, buf, len, flags, NULL, 0));
 }
 
 ssize_t
-usp_sendto(int s, const void *buf, size_t len, int flags,
-         const struct usp_sockaddr *to, socklen_t tolen)
+rsp_sendto(int s, const void *buf, size_t len, int flags,
+         const struct rsp_sockaddr *to, socklen_t tolen)
 {
     struct msghdr msg;
     struct iovec aiov;
@@ -761,7 +761,7 @@ kern_fail:
 }
 
 ssize_t
-usp_sendmsg(int s, const struct msghdr *msg, int flags)
+rsp_sendmsg(int s, const struct msghdr *msg, int flags)
 {
     int rc;
     struct sockaddr freebsd_sa;
@@ -769,7 +769,7 @@ usp_sendmsg(int s, const struct msghdr *msg, int flags)
 
     if (linux_sa != NULL) {
         linux2freebsd_sockaddr(linux_sa,
-            sizeof(struct usp_sockaddr), &freebsd_sa);
+            sizeof(struct rsp_sockaddr), &freebsd_sa);
         __DECONST(struct msghdr *, msg)->msg_name = &freebsd_sa;
     }
 
@@ -790,14 +790,14 @@ kern_fail:
 
 
 ssize_t
-usp_recv(int s, void *buf, size_t len, int flags)
+rsp_recv(int s, void *buf, size_t len, int flags)
 {
-    return (usp_recvfrom(s, buf, len, flags, NULL, 0));
+    return (rsp_recvfrom(s, buf, len, flags, NULL, 0));
 }
 
 ssize_t
-usp_recvfrom(int s, void *buf, size_t len, int flags,
-    struct usp_sockaddr *from, socklen_t *fromlen)
+rsp_recvfrom(int s, void *buf, size_t len, int flags,
+    struct rsp_sockaddr *from, socklen_t *fromlen)
 {
     struct msghdr msg;
     struct iovec aiov;
@@ -823,7 +823,7 @@ usp_recvfrom(int s, void *buf, size_t len, int flags,
         *fromlen = msg.msg_namelen;
 
     if (from)
-        freebsd2usp_sockaddr(from, &bsdaddr);
+        freebsd2rsp_sockaddr(from, &bsdaddr);
 
     return (rc);
 kern_fail:
@@ -832,7 +832,7 @@ kern_fail:
 }
 
 ssize_t
-usp_recvmsg(int s, struct msghdr *msg, int flags)
+rsp_recvmsg(int s, struct msghdr *msg, int flags)
 {
     int rc, oldflags;
 
@@ -845,7 +845,7 @@ usp_recvmsg(int s, struct msghdr *msg, int flags)
     }
     rc = curthread->td_retval[0];
 
-    //freebsd2usp_sockaddr(msg->msg_name, msg->msg_name);
+    //freebsd2rsp_sockaddr(msg->msg_name, msg->msg_name);
 
     return (rc);
 kern_fail:
@@ -854,7 +854,7 @@ kern_fail:
 }
 
 int
-usp_fcntl(int fd, int cmd, ...)
+rsp_fcntl(int fd, int cmd, ...)
 {
     int rc;
     va_list ap;
@@ -875,7 +875,7 @@ kern_fail:
 }
 
 int
-usp_accept(int s, struct usp_sockaddr * addr,
+rsp_accept(int s, struct rsp_sockaddr * addr,
     socklen_t * addrlen)
 {
     int rc;
@@ -890,7 +890,7 @@ usp_accept(int s, struct usp_sockaddr * addr,
     fdrop(fp, curthread);
 
     if (addr && pf)
-        freebsd2usp_sockaddr(addr, pf);
+        freebsd2rsp_sockaddr(addr, pf);
 
     if (addrlen)
         *addrlen = socklen;
@@ -907,7 +907,7 @@ kern_fail:
 }
 
 int
-usp_listen(int s, int backlog)
+rsp_listen(int s, int backlog)
 {
     int rc;
     struct listen_args la = {
@@ -924,7 +924,7 @@ kern_fail:
 }
 
 int
-usp_bind(int s, const struct usp_sockaddr *addr, socklen_t addrlen)
+rsp_bind(int s, const struct rsp_sockaddr *addr, socklen_t addrlen)
 {
     int rc;    
     struct sockaddr bsdaddr;
@@ -940,7 +940,7 @@ kern_fail:
 }
 
 int
-usp_connect(int s, const struct usp_sockaddr *name, socklen_t namelen)
+rsp_connect(int s, const struct rsp_sockaddr *name, socklen_t namelen)
 {
     int rc;
     struct sockaddr bsdaddr;
@@ -956,7 +956,7 @@ kern_fail:
 }
 
 int
-usp_getpeername(int s, struct usp_sockaddr * name,
+rsp_getpeername(int s, struct rsp_sockaddr * name,
     socklen_t *namelen)
 {
     int rc;
@@ -966,7 +966,7 @@ usp_getpeername(int s, struct usp_sockaddr * name,
         goto kern_fail;
 
     if (name && pf)
-        freebsd2usp_sockaddr(name, pf);
+        freebsd2rsp_sockaddr(name, pf);
 
     if(pf != NULL)
         free(pf, M_SONAME);
@@ -980,7 +980,7 @@ kern_fail:
 }
 
 int
-usp_getsockname(int s, struct usp_sockaddr *name,
+rsp_getsockname(int s, struct rsp_sockaddr *name,
     socklen_t *namelen)
 {
     int rc;
@@ -990,7 +990,7 @@ usp_getsockname(int s, struct usp_sockaddr *name,
         goto kern_fail;
 
     if (name && pf)
-        freebsd2usp_sockaddr(name, pf);
+        freebsd2rsp_sockaddr(name, pf);
 
     if(pf != NULL)
         free(pf, M_SONAME);
@@ -1004,7 +1004,7 @@ kern_fail:
 }
 
 int    
-usp_shutdown(int s, int how)
+rsp_shutdown(int s, int how)
 {
     int rc;
 
@@ -1022,7 +1022,7 @@ kern_fail:
 }
 
 int
-usp_sysctl(const int *name, u_int namelen, void *oldp, size_t *oldlenp,
+rsp_sysctl(const int *name, u_int namelen, void *oldp, size_t *oldlenp,
          const void *newp, size_t newlen)
 {
     int rc;
@@ -1041,7 +1041,7 @@ kern_fail:
 }
 
 int
-usp_select(int nfds, usp_fd_set *readfds, usp_fd_set *writefds, usp_fd_set *exceptfds,
+rsp_select(int nfds, rsp_fd_set *readfds, rsp_fd_set *writefds, rsp_fd_set *exceptfds,
     struct timeval *timeout)
 
 {
@@ -1060,7 +1060,7 @@ kern_fail:
 }
 
 int
-usp_poll(struct usp_pollfd fds[], usp_nfds_t nfds, int timeout)
+rsp_poll(struct rsp_pollfd fds[], rsp_nfds_t nfds, int timeout)
 {
     int rc;
     struct timespec ts;
@@ -1231,8 +1231,8 @@ kern_fail:
 
 int
 ff_route_ctl(enum FF_ROUTE_CTL req, enum FF_ROUTE_FLAG flag,
-    struct usp_sockaddr *dst, struct usp_sockaddr *gw,
-    struct usp_sockaddr *netmask)
+    struct rsp_sockaddr *dst, struct rsp_sockaddr *gw,
+    struct rsp_sockaddr *netmask)
 
 {
     struct sockaddr sa_gw, sa_dst, sa_nm;

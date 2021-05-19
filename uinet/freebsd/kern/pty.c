@@ -192,7 +192,7 @@ pty_modevent(module_t mod, int type, void *data)
 int tpdev_open(struct tty *tp, struct cdev *dev, int oflags);
 
 
-int usp_openpty(int *amaster, int *aslave, char *name)
+int rsp_openpty(int *amaster, int *aslave, char *name)
 {
 	int error, fd_master,fd_slave;
 	struct file *fp_master,*fp_slave;

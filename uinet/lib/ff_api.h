@@ -39,7 +39,7 @@ extern "C" {
 #include "ff_event.h"
 #include "ff_errno.h"
 
-#include "usp_socket.h"
+#include "rsp_socket.h"
 
 struct linux_sockaddr {
     short sa_family;
@@ -97,8 +97,8 @@ enum FF_ROUTE_FLAG {
  * On error, -1 is returned, and errno is set appropriately.
  */
 int ff_route_ctl(enum FF_ROUTE_CTL req, enum FF_ROUTE_FLAG flag,
-    struct usp_sockaddr *dst, struct usp_sockaddr *gw,
-    struct usp_sockaddr *netmask);
+    struct rsp_sockaddr *dst, struct rsp_sockaddr *gw,
+    struct rsp_sockaddr *netmask);
 
 /* route api end */
 
@@ -156,7 +156,7 @@ enum FF_NGCTL_CMD {
 int ff_ngctl(int cmd, void *data);
 
 
-int usp_pthread_create(char *name, pthread_t *thread, const pthread_attr_t *attr,
+int rsp_pthread_create(char *name, pthread_t *thread, const pthread_attr_t *attr,
                           void *(*start_routine) (void *), void *arg);
 
 /* internal api end */

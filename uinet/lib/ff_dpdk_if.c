@@ -385,7 +385,7 @@ protocol_filter(const void *data, uint16_t len)
 static inline void
 handle_sysctl_msg(struct ff_msg *msg)
 {	
-    int ret = usp_sysctl(msg->sysctl.name, msg->sysctl.namelen,
+    int ret = rsp_sysctl(msg->sysctl.name, msg->sysctl.namelen,
         msg->sysctl.old, msg->sysctl.oldlenp, msg->sysctl.new,
         msg->sysctl.newlen);
 
@@ -400,15 +400,15 @@ static inline void
 handle_ioctl_msg(struct ff_msg *msg)
 {
     int fd, ret;
-    fd = usp_socket(AF_INET, SOCK_DGRAM, 0);
+    fd = rsp_socket(AF_INET, SOCK_DGRAM, 0);
     if (fd < 0) {
         ret = -1;
         goto done;
     }
 
-    ret = usp_ioctl_freebsd(fd, msg->ioctl.cmd, msg->ioctl.data);
+    ret = rsp_ioctl_freebsd(fd, msg->ioctl.cmd, msg->ioctl.data);
 
-    usp_close(fd);
+    rsp_close(fd);
 
 done:
     if (ret < 0) {
@@ -456,7 +456,7 @@ static inline void
 handle_ipfw_msg(struct ff_msg *msg)
 {
     int fd, ret;
-    fd = usp_socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
+    fd = rsp_socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
     if (fd < 0) {
         ret = -1;
         goto done;
@@ -464,12 +464,12 @@ handle_ipfw_msg(struct ff_msg *msg)
 
     switch (msg->ipfw.cmd) {
         case FF_IPFW_GET:
-            ret = usp_getsockopt_freebsd(fd, msg->ipfw.level,
+            ret = rsp_getsockopt_freebsd(fd, msg->ipfw.level,
                 msg->ipfw.optname, msg->ipfw.optval,
                 msg->ipfw.optlen);
             break;
         case FF_IPFW_SET:
-            ret = usp_setsockopt_freebsd(fd, msg->ipfw.level,
+            ret = rsp_setsockopt_freebsd(fd, msg->ipfw.level,
                 msg->ipfw.optname, msg->ipfw.optval,
                 *(msg->ipfw.optlen)); 
             break;

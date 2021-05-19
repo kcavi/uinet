@@ -152,7 +152,7 @@ int _uhi_rwlock_wowned(uhi_rwlock_t *rw);
 
 int sched_yield(void);
 
-int usp_pthread_create(char *name, pthread_t *thread, const pthread_attr_t *attr,
+int rsp_pthread_create(char *name, pthread_t *thread, const pthread_attr_t *attr,
                           void *(*start_routine) (void *), void *arg);
 
 

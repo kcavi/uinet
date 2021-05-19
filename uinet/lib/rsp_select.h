@@ -29,11 +29,11 @@
  * $FreeBSD$
  */
 
-#ifndef _USP_SYS_SELECT_H_
-#define	_USP_SYS_SELECT_H_
+#ifndef _RSP_SYS_SELECT_H_
+#define	_RSP_SYS_SELECT_H_
 
 
-typedef	unsigned long	__usp_fd_mask;
+typedef	unsigned long	__rsp_fd_mask;
 
 /*
  * Select uses bit masks of file descriptors in longs.  These macros
@@ -42,35 +42,35 @@ typedef	unsigned long	__usp_fd_mask;
  * be enough for most uses.
  */
 
-#define	USP_FD_SETSIZE	1024
+#define	RSP_FD_SETSIZE	1024
 
-#define	_USPNFDBITS	(sizeof(__fd_mask) * 8)	/* bits per mask */
+#define	_RSPNFDBITS	(sizeof(__fd_mask) * 8)	/* bits per mask */
 #define	_usphowmany(x, y)	(((x) + ((y) - 1)) / (y))
 
 
-typedef	struct usp_fd_set {
-	__fd_mask	__fds_bits[_usphowmany(USP_FD_SETSIZE, _USPNFDBITS)];
-} usp_fd_set;
+typedef	struct rsp_fd_set {
+	__fd_mask	__fds_bits[_usphowmany(RSP_FD_SETSIZE, _RSPNFDBITS)];
+} rsp_fd_set;
 
 
-#define	__usp_fdset_mask(n)	((__fd_mask)1 << ((n) % _USPNFDBITS))
-#define	USP_FD_CLR(n, p)	((p)->__fds_bits[(n)/_USPNFDBITS] &= ~__fdset_mask(n))
+#define	__rsp_fdset_mask(n)	((__fd_mask)1 << ((n) % _RSPNFDBITS))
+#define	RSP_FD_CLR(n, p)	((p)->__fds_bits[(n)/_RSPNFDBITS] &= ~__fdset_mask(n))
 
-#define	USP_FD_COPY(f, t)	(void)(*(t) = *(f))
+#define	RSP_FD_COPY(f, t)	(void)(*(t) = *(f))
 
-#define	USP_FD_ISSET(n, p)	(((p)->__fds_bits[(n)/_USPNFDBITS] & __usp_fdset_mask(n)) != 0)
-#define	USP_FD_SET(n, p)	((p)->__fds_bits[(n)/_USPNFDBITS] |= __usp_fdset_mask(n))
-#define	USP_FD_ZERO(p) do {					\
-	usp_fd_set *_p;					\
+#define	RSP_FD_ISSET(n, p)	(((p)->__fds_bits[(n)/_RSPNFDBITS] & __rsp_fdset_mask(n)) != 0)
+#define	RSP_FD_SET(n, p)	((p)->__fds_bits[(n)/_RSPNFDBITS] |= __rsp_fdset_mask(n))
+#define	RSP_FD_ZERO(p) do {					\
+	rsp_fd_set *_p;					\
 	size_t _n;					\
 							\
 	_p = (p);					\
-	_n = _usphowmany(USP_FD_SETSIZE, _USPNFDBITS);		\
+	_n = _usphowmany(RSP_FD_SETSIZE, _RSPNFDBITS);		\
 	while (_n > 0)					\
 		_p->__fds_bits[--_n] = 0;		\
 } while (0)
 
-int	usp_select(int, usp_fd_set *, usp_fd_set *, usp_fd_set *, struct timeval *);
+int	rsp_select(int, rsp_fd_set *, rsp_fd_set *, rsp_fd_set *, struct timeval *);
 
 
-#endif /* _USP_SYS_SELECT_H_ */
+#endif /* _RSP_SYS_SELECT_H_ */

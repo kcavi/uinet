@@ -506,7 +506,7 @@ int uhi_thread_create(uhi_thread_t *new_thread, struct uhi_thread_start_args *st
 }
 
 
-int usp_pthread_create(char *name, pthread_t *thread, const pthread_attr_t *attr,
+int rsp_pthread_create(char *name, pthread_t *thread, const pthread_attr_t *attr,
                           void *(*start_routine) (void *), void *arg)
 {
 	struct uhi_thread_start_args *tsa;
@@ -582,7 +582,7 @@ ff_realloc(void *p, unsigned long size)
     return (p);
 }
 
-void *usp_malloc(unsigned long size)
+void *rsp_malloc(unsigned long size)
 {
 	void *alloc;
 
@@ -593,13 +593,13 @@ void *usp_malloc(unsigned long size)
 	return (alloc);
 }
 
-void *usp_calloc(unsigned long number, unsigned long size)
+void *rsp_calloc(unsigned long number, unsigned long size)
 {
     return (calloc(number, size));
 }
 
 
-void *usp_free(void *p)
+void *rsp_free(void *p)
 {
 	 free(p);
 }

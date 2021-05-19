@@ -28,19 +28,19 @@
  * $FreeBSD$
  */
 
-#ifndef _USP_SYS_POLL_H_
-#define	_USP_SYS_POLL_H_
+#ifndef _RSP_SYS_POLL_H_
+#define	_RSP_SYS_POLL_H_
 
 /*
  * This file is intended to be compatible with the traditional poll.h.
  */
 
-typedef	unsigned int	usp_nfds_t;
+typedef	unsigned int	rsp_nfds_t;
 
 /*
  * This structure is passed as an array to poll(2).
  */
-struct usp_pollfd {
+struct rsp_pollfd {
 	int	fd;		/* which file descriptor to poll */
 	short	events;		/* events we are interested in */
 	short	revents;	/* events found on return */
@@ -56,25 +56,25 @@ struct usp_pollfd {
  * POLLIN includes all of normal, band and urgent data.  Most poll handlers
  * on FreeBSD only treat it as "normal" data.
  */
-#define	USP_POLLIN		0x0001		/* any readable data available */
-#define	USP_POLLPRI		0x0002		/* OOB/Urgent readable data */
-#define	USP_POLLOUT		0x0004		/* file descriptor is writeable */
-#define	USP_POLLRDNORM	0x0040		/* non-OOB/URG data available */
-#define	USP_POLLWRNORM	POLLOUT		/* no write type differentiation */
-#define	USP_POLLRDBAND	0x0080		/* OOB/Urgent readable data */
-#define	USP_POLLWRBAND	0x0100		/* OOB/Urgent data can be written */
+#define	RSP_POLLIN		0x0001		/* any readable data available */
+#define	RSP_POLLPRI		0x0002		/* OOB/Urgent readable data */
+#define	RSP_POLLOUT		0x0004		/* file descriptor is writeable */
+#define	RSP_POLLRDNORM	0x0040		/* non-OOB/URG data available */
+#define	RSP_POLLWRNORM	POLLOUT		/* no write type differentiation */
+#define	RSP_POLLRDBAND	0x0080		/* OOB/Urgent readable data */
+#define	RSP_POLLWRBAND	0x0100		/* OOB/Urgent data can be written */
 
 
-#define	USP_POLLINIGNEOF	0x2000		/* like POLLIN, except ignore EOF */
+#define	RSP_POLLINIGNEOF	0x2000		/* like POLLIN, except ignore EOF */
 
 
 /*
  * These events are set if they occur regardless of whether they were
  * requested.
  */
-#define	USP_POLLERR		0x0008		/* some poll error occurred */
-#define	USP_POLLHUP		0x0010		/* file descriptor was "hung up" */
-#define	USP_POLLNVAL	0x0020		/* requested events "invalid" */
+#define	RSP_POLLERR		0x0008		/* some poll error occurred */
+#define	RSP_POLLHUP		0x0010		/* file descriptor was "hung up" */
+#define	RSP_POLLNVAL	0x0020		/* requested events "invalid" */
 
 
-#endif /* !_USP_POLL_H_ */
+#endif /* !_RSP_POLL_H_ */

@@ -67,7 +67,7 @@ int loop(void *arg)
         /* Handle new connect */
         if (events[i].data.fd == sockfd) {
             while (1) {
-                int nclientfd = usp_accept(sockfd, NULL, NULL);
+                int nclientfd = rsp_accept(sockfd, NULL, NULL);
                 if (nclientfd < 0) {
                     break;
                 }
@@ -85,15 +85,15 @@ int loop(void *arg)
             if (events[i].events & EPOLLERR ) {
                 /* Simply close socket */
                 ff_epoll_ctl(epfd, EPOLL_CTL_DEL,  events[i].data.fd, NULL);
-                usp_close(events[i].data.fd);
+                rsp_close(events[i].data.fd);
             } else if (events[i].events & EPOLLIN) {
                 char buf[256];
-                size_t readlen = usp_read( events[i].data.fd, buf, sizeof(buf));
+                size_t readlen = rsp_read( events[i].data.fd, buf, sizeof(buf));
                 if(readlen > 0) {
-                    usp_write( events[i].data.fd, html, sizeof(html));
+                    rsp_write( events[i].data.fd, html, sizeof(html));
                 } else {
                     ff_epoll_ctl(epfd, EPOLL_CTL_DEL,  events[i].data.fd, NULL);
-                    usp_close( events[i].data.fd);
+                    rsp_close( events[i].data.fd);
                 }
             } else {
                 printf("unknown event: %8.8X\n", events[i].events);
@@ -106,15 +106,15 @@ int main(int argc, char * argv[])
 {
     ff_init(argc, argv);
 
-    sockfd = usp_socket(AF_INET, SOCK_STREAM, 0);
+    sockfd = rsp_socket(RSP_AF_INET, RSP_SOCK_STREAM, 0);
     printf("sockfd:%d\n", sockfd);
     if (sockfd < 0) {
-        printf("usp_socket failed\n");
+        printf("rsp_socket failed\n");
         exit(1);
     }
 
     int on = 1;
-    usp_ioctl(sockfd, FIONBIO, &on);
+    rsp_ioctl(sockfd, FIONBIO, &on);
 
     struct sockaddr_in my_addr;
     bzero(&my_addr, sizeof(my_addr));
@@ -122,15 +122,15 @@ int main(int argc, char * argv[])
     my_addr.sin_port = htons(80);
     my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    int ret = usp_bind(sockfd, (struct usp_sockaddr *)&my_addr, sizeof(my_addr));
+    int ret = rsp_bind(sockfd, (struct rsp_sockaddr *)&my_addr, sizeof(my_addr));
     if (ret < 0) {
-        printf("usp_bind failed\n");
+        printf("rsp_bind failed\n");
         exit(1);
     }
 
-    ret = usp_listen(sockfd, MAX_EVENTS);
+    ret = rsp_listen(sockfd, MAX_EVENTS);
     if (ret < 0) {
-        printf("usp_listen failed\n");
+        printf("rsp_listen failed\n");
         exit(1);
     }
 
