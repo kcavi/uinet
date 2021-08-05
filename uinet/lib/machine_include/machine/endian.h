@@ -37,12 +37,6 @@
 #include <sys/_types.h>
 
 /*
- * Define the order of 32-bit words in 64-bit words.
- */
-#define	_QUAD_HIGHWORD 1
-#define	_QUAD_LOWWORD 0
-
-/*
  * Definitions for byte order, according to byte significance from low
  * address to high.
  */
@@ -50,7 +44,24 @@
 #define	_BIG_ENDIAN	4321	/* MSB first: 68000, ibm, net */
 #define	_PDP_ENDIAN	3412	/* LSB first in word, MSW first in long */
 
+
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define	_BYTE_ORDER	_BIG_ENDIAN
+#else
 #define	_BYTE_ORDER	_LITTLE_ENDIAN
+#endif
+
+/*
+ * Define the order of 32-bit words in 64-bit words.
+ */
+#if _BYTE_ORDER == _BIG_ENDIAN
+#define _QUAD_HIGHWORD 0
+#define _QUAD_LOWWORD 1
+#else
+#define	_QUAD_HIGHWORD 1
+#define	_QUAD_LOWWORD 0
+#endif
+
 
 /*
  * Deprecated variants that don't have enough underscores to be useful in more
@@ -111,9 +122,16 @@ __bswap64_var(__uint64_t _x)
 	return (__bswap64_gen(_x));
 }
 
+#if _BYTE_ORDER == _BIG_ENDIAN
+#define	__htonl(x)	((__uint32_t)(x))
+#define	__htons(x)	((__uint16_t)(x))
+#define	__ntohl(x)	((__uint32_t)(x))
+#define	__ntohs(x)	((__uint16_t)(x))
+#else
 #define	__htonl(x)	__bswap32(x)
 #define	__htons(x)	__bswap16(x)
 #define	__ntohl(x)	__bswap32(x)
 #define	__ntohs(x)	__bswap16(x)
+#endif
 
 #endif /* !_MACHINE_ENDIAN_H_ */

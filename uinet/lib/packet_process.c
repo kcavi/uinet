@@ -28,18 +28,57 @@ void ff_thread_set_name(const char *name);
 
 long vm_max_kernel_address;
 
+static int char2int(int8_t x)
+{
+	int value = -1;
+	switch(x)
+	{
+		case 'A':
+		case 'B':
+		case 'C':
+		case 'D':
+		case 'E':
+		case 'F':
+  	   		value = x - 'A' + 10;
+			break;
+		case 'a':
+		case 'b':
+		case 'c':
+		case 'd':
+		case 'e':
+		case 'f':
+  	   		value = x - 'a' + 10;
+			break;
+	      	case '0':
+ 	      	case '1':
+		case '2':
+       	case '3':
+       	case '4':
+       	case '5':
+       	case '6':
+       	case '7':
+       	case '8':
+       	case '9':
+			value = x - '0';
+               	break;
+       	default:
+       		break;
+     	}
+     	return value;
+}
 
 
 int set_port_mac(char *machex,const char *macstr)
 {
-	sscanf(macstr,"%02x:%02x:%02x:%02x:%02x:%02x",
-		(unsigned int *)&machex[0],
-		(unsigned int *)&machex[1],
-		(unsigned int *)&machex[2],
-		(unsigned int *)&machex[3],
-		(unsigned int *)&machex[4],
-		(unsigned int *)&machex[5]);
-	
+    machex[0]=(char2int(macstr[0]) << 4) | char2int(macstr[1]);
+    machex[1]=(char2int(macstr[3]) << 4) | char2int(macstr[4]);
+    machex[2]=(char2int(macstr[6]) << 4) | char2int(macstr[7]);
+    machex[3]=(char2int(macstr[9]) << 4) | char2int(macstr[10]);
+    machex[4]=(char2int(macstr[12]) << 4) | char2int(macstr[13]);
+    machex[5]=(char2int(macstr[15]) << 4) | char2int(macstr[16]);
+    return 0;
+
+
 }
 
 
@@ -343,6 +382,12 @@ void msg_loop(void)
 int packet_sys_send(char *pkt, int len ,int port)
 {
     int n,i;
+
+    if(len < 60)
+    {
+        memset(pkt+len,0,60-len);
+        len = 60;
+    }
 
 	if(packet_debug == 1)
 	{
