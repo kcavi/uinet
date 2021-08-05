@@ -39,7 +39,7 @@ static int char2int(int8_t x)
 		case 'D':
 		case 'E':
 		case 'F':
-  	   		value = x - 'A' + 10;
+			value = x - 'A' + 10;
 			break;
 		case 'a':
 		case 'b':
@@ -47,36 +47,36 @@ static int char2int(int8_t x)
 		case 'd':
 		case 'e':
 		case 'f':
-  	   		value = x - 'a' + 10;
+			value = x - 'a' + 10;
 			break;
-	      	case '0':
- 	      	case '1':
+			case '0':
+			case '1':
 		case '2':
-       	case '3':
-       	case '4':
-       	case '5':
-       	case '6':
-       	case '7':
-       	case '8':
-       	case '9':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		case '8':
+		case '9':
 			value = x - '0';
-               	break;
-       	default:
-       		break;
-     	}
-     	return value;
+				break;
+		default:
+			break;
+		}
+		return value;
 }
 
 
 int set_port_mac(char *machex,const char *macstr)
 {
-    machex[0]=(char2int(macstr[0]) << 4) | char2int(macstr[1]);
-    machex[1]=(char2int(macstr[3]) << 4) | char2int(macstr[4]);
-    machex[2]=(char2int(macstr[6]) << 4) | char2int(macstr[7]);
-    machex[3]=(char2int(macstr[9]) << 4) | char2int(macstr[10]);
-    machex[4]=(char2int(macstr[12]) << 4) | char2int(macstr[13]);
-    machex[5]=(char2int(macstr[15]) << 4) | char2int(macstr[16]);
-    return 0;
+	machex[0]=(char2int(macstr[0]) << 4) | char2int(macstr[1]);
+	machex[1]=(char2int(macstr[3]) << 4) | char2int(macstr[4]);
+	machex[2]=(char2int(macstr[6]) << 4) | char2int(macstr[7]);
+	machex[3]=(char2int(macstr[9]) << 4) | char2int(macstr[10]);
+	machex[4]=(char2int(macstr[12]) << 4) | char2int(macstr[13]);
+	machex[5]=(char2int(macstr[15]) << 4) | char2int(macstr[16]);
+	return 0;
 
 
 }
@@ -125,7 +125,7 @@ kick_proc0(void)
 
 /* split string into tokens */
 int strsplit(char *string, int stringlen,
-	     char **tokens, int maxtokens, char delim)
+		 char **tokens, int maxtokens, char delim)
 {
 	int i, tok = 0;
 	int tokstart = 1; /* first token is right at start of string */
@@ -170,7 +170,7 @@ int get_ifindex(char *interface)
 
 	ifr->ifr_addr.sa_family = AF_INET;
 	strcpy(ifr->ifr_name, interface);
-	
+
 	if (ioctl(fd, SIOCGIFINDEX, ifr) != 0) {
 		close(fd);
 		return -1;
@@ -182,7 +182,7 @@ int get_ifindex(char *interface)
 
 #define FSTACK_SHM_KEY 0x11223388
 
-void msg_loop(void) 
+void msg_loop(void)
 {
 	int sock=-1, n;
 	unsigned char buffer[10240];
@@ -191,7 +191,7 @@ void msg_loop(void)
 	int packet_len=1518;
 	int if_index=0;
 	char *device = ff_global_cfg.packet_bind_dev;
-	
+
 	unsigned int  protocol=0;
 	int count_flags=0;
 	int timeval;
@@ -212,7 +212,7 @@ void msg_loop(void)
 	ff_thread_set_name("msg_loop");
 
 	tmp = malloc(10240);
-		
+
 	if ( (packet_fd=socket(PF_PACKET,SOCK_RAW,protocol != 0?htons(protocol):htons(ETH_P_ALL)))<0) {
 		perror("create socket failed");
 		return;
@@ -222,19 +222,19 @@ void msg_loop(void)
 	if(0 >= cmdSocket)
 	{
 		perror("create cmdSock failed!");
-		return;		
+		return;
 	}
 
 	unlink(FSTACK_SOCKET_PATH);
 	bzero((char *)(&cmdAddr), sizeof(cmdAddr));
 	cmdAddr.sun_family = AF_UNIX;
 	strcpy(cmdAddr.sun_path, FSTACK_SOCKET_PATH);
-	if(0 != bind(cmdSocket, (struct sockaddr *)(&cmdAddr), sizeof(cmdAddr))) 
+	if(0 != bind(cmdSocket, (struct sockaddr *)(&cmdAddr), sizeof(cmdAddr)))
 	{
 		perror("bind failed!");
 		return;
 	}
-	
+
 #if 0
 	if(0 != listen(cmdSocket, 10))
 	{
@@ -247,7 +247,7 @@ void msg_loop(void)
 		printf("invalid interface\n");
 		exit(-1);
 	}
-	
+
 	memset(&sock_addr,0,sizeof(sock_addr));
 	sock_addr.sll_family = AF_PACKET;
 	sock_addr.sll_protocol = (protocol != 0?htons(protocol):htons(ETH_P_ALL));
@@ -265,7 +265,7 @@ void msg_loop(void)
 		perror("shmget error");
 		return;
 	}
-	
+
 	char *share_addr = NULL /* (char *)0x7ffff1000000*/;
 	msg_tmp = (struct ff_msg *)shmat(shm_id,share_addr,0);
 	if( (void *) -1 == msg_tmp)
@@ -286,19 +286,19 @@ void msg_loop(void)
 
 		waittime.tv_sec= 1;
 		waittime.tv_usec = 0;
-		
-		
+
+
 		ret = select(maxFd+1,&rfd,NULL,NULL,&waittime);
 		if(ret <= 0)
 			continue;
-		
+
 		if(FD_ISSET(packet_fd,&rfd))
 		{
 			n = recv(packet_fd,buffer, sizeof(buffer), 0);
-			
-			
+
+
 			packet_num++;
-		
+
 			if(packet_debug == 1)
 			{
 				printf("packet %3d:\n",packet_num);
@@ -307,13 +307,13 @@ void msg_loop(void)
 				printf("\n");
 			}
 
-			
+
 			recv_buf = malloc(2000);
 			memset(recv_buf,0,2000);
-			
+
 			memcpy(recv_buf,buffer,n>2000?2000:n);
 			ff_veth_input(recv_buf,n,0);
-			
+
 		}
 
 		if(FD_ISSET(cmdSocket, &rfd))
@@ -334,16 +334,16 @@ void msg_loop(void)
 			//msg->buf_len =10112;
 			msg->sysctl.name = msg->buf_addr;
 			//msg->sysctl.new = msg->sysctl.name + msg->sysctl.namelen*sizeof(int);
-			msg->sysctl.oldlenp  = (char *)(msg->sysctl.name) + msg->sysctl.namelen*sizeof(int);
+			msg->sysctl.oldlenp	 = (char *)(msg->sysctl.name) + msg->sysctl.namelen*sizeof(int);
 #endif
 
-			
+
 			msg = msg_tmp;
 
 			#if 0
 			printf("msg = %p \n",msg);
 			printf("msg->msg_type=%d\n", msg->msg_type);
-			printf("msg->buf_addr=%p\n", msg->buf_addr);	
+			printf("msg->buf_addr=%p\n", msg->buf_addr);
 			printf("msg->buf_len=%lu\n", msg->buf_len);
 			printf("msg->sysctl.name=%p\n", msg->sysctl.name);
 			printf("msg->sysctl.namelen=%d\n", msg->sysctl.namelen);
@@ -353,13 +353,13 @@ void msg_loop(void)
 			printf("msg->sysctl.newlen=%lu\n",	msg->sysctl.newlen);
 			fflush(NULL);
 			#endif
-			
+
 			handle_msg(msg, 0);
 
 			#if 0
 			printf("\n\n\n");
 			printf("msg->msg_type=%d\n", msg->msg_type);
-			printf("msg->buf_addr=%p\n", msg->buf_addr);	
+			printf("msg->buf_addr=%p\n", msg->buf_addr);
 			printf("msg->buf_len=%lu\n", msg->buf_len);
 			printf("msg->sysctl.name=%p\n", msg->sysctl.name);
 			printf("msg->sysctl.namelen=%d\n", msg->sysctl.namelen);
@@ -368,36 +368,36 @@ void msg_loop(void)
 			printf("msg->sysctl.new=%p\n",	msg->sysctl.new);
 			printf("msg->sysctl.newlen=%lu\n",	msg->sysctl.newlen);
 			#endif
-			
+
 			sendto(cmdSocket,buffer, sizeof(buffer), 0,
 				(struct sockaddr *)&cmdAddr,addrlen);
 		}
 
 	}
-	
+
 	return;
 
 }
 
 int packet_sys_send(char *pkt, int len ,int port)
 {
-    int n,i;
+	int n,i;
 
-    if(len < 60)
-    {
-        memset(pkt+len,0,60-len);
-        len = 60;
-    }
+	if(len < 60)
+	{
+		memset(pkt+len,0,60-len);
+		len = 60;
+	}
 
 	if(packet_debug == 1)
 	{
-	    printf("packet_send len=%d\n",len);
+		printf("packet_send len=%d\n",len);
 
-	    for(i=0;i<len;i++)
-	         printf("%02x ",(unsigned char )pkt[i]);
-	    printf("\n");
+		for(i=0;i<len;i++)
+			 printf("%02x ",(unsigned char )pkt[i]);
+		printf("\n");
 	}
-    n = send(packet_fd, pkt, len, 0);
+	n = send(packet_fd, pkt, len, 0);
 	if(n == len)
 		return 0;
 	else

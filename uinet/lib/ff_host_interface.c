@@ -7,10 +7,10 @@
  * modification, are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
+ *	 list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
+ *	 this list of conditions and the following disclaimer in the documentation
+ *	 and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -52,7 +52,6 @@ int pthread_setname_np(pthread_t thread, const char *name);
 
 void uhi_clock_gettime(int id, int64_t *sec, long *nsec)
 {
-
 	struct timespec ts;
 	int host_id;
 	int rv;
@@ -87,7 +86,7 @@ int uhi_cond_init(uhi_cond_t *c)
 	pthread_cond_t *pc;
 	int error;
 
-	
+
 	pc = malloc(sizeof(pthread_cond_t));
 	if (NULL == pc)
 		return (ENOMEM);
@@ -106,7 +105,7 @@ int uhi_cond_init(uhi_cond_t *c)
 void uhi_cond_destroy(uhi_cond_t *c)
 {
 	pthread_cond_t *pc;
-	
+
 	pc = (pthread_cond_t *)(*c);
 
 	pthread_cond_destroy(pc);
@@ -136,7 +135,7 @@ int uhi_cond_timedwait(uhi_cond_t *c, uhi_mutex_t *m, uint64_t nsecs)
 		abstime.tv_sec++;
 	}
 	abstime.tv_nsec = total_nsec;
-	
+
 	return (pthread_cond_timedwait((pthread_cond_t *)(*c), (pthread_mutex_t *)(*m), &abstime));
 }
 
@@ -168,15 +167,15 @@ int uhi_mutex_init(uhi_mutex_t *m, int opts)
 	pthread_mutexattr_init(&attr);
 
 	if (opts & UHI_MTX_RECURSE) {
-		if (0 != pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE)) 
+		if (0 != pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE))
 			printf("Warning: mtx will not be recursive\n");
 	} else {
 		if (0 != pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ADAPTIVE_NP))
 			pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_NORMAL);
 	}
-	
+
 	error = pthread_mutex_init(pm, &attr);
-	pthread_mutexattr_destroy(&attr);	    
+	pthread_mutexattr_destroy(&attr);
 
 	return (error);
 }
@@ -185,7 +184,7 @@ int uhi_mutex_init(uhi_mutex_t *m, int opts)
 void uhi_mutex_destroy(uhi_mutex_t *m)
 {
 	pthread_mutex_t *pm;
-	
+
 	pm = (pthread_mutex_t *)(*m);
 
 	pthread_mutex_destroy(pm);
@@ -222,20 +221,14 @@ int uhi_rwlock_init(uhi_rwlock_t *rw, int opts)
 	pthread_rwlockattr_t attr;
 	pthread_rwlock_t *pm;
 	int error;
-	
+
 	pm = malloc(sizeof(pthread_rwlock_t));
 	if (NULL == pm)
 		return (ENOMEM);
 
-	//pthread_rwlock_init(&attr);
-
 
 	error = pthread_rwlock_init(pm, NULL);
 	*rw = pm;
-	//pthread_mutexattr_destroy(&attr);
-
-	//printf("%s %d rw=0x%x  *rw=0x%x\n",__func__,__LINE__,rw,*rw);
-	
 
 	return (error);
 }
@@ -244,9 +237,8 @@ int uhi_rwlock_init(uhi_rwlock_t *rw, int opts)
 void uhi_rwlock_destroy(uhi_rwlock_t *rw)
 {
 	pthread_rwlock_t *pm;
-	
+
 	pm = (pthread_rwlock_t *)(*rw);
-	//printf("%s %d rw=0x%x\n",__func__,__LINE__,rw);
 
 	pthread_rwlock_destroy(pm);
 	free(pm);
@@ -260,7 +252,7 @@ void _uhi_rwlock_wlock(uhi_rwlock_t *rw, void *l, const char *file, int line)
 		printf("%s %d rw=0x%p\n",__func__,__LINE__,*rw);
 		return ;
 	}
-	
+
 	pthread_rwlock_wrlock((pthread_rwlock_t *)(*rw));
 }
 
@@ -292,7 +284,7 @@ void _uhi_rwlock_rlock(uhi_rwlock_t *rw, void *l, const char *file, int line)
 		printf("%s %d rw=0x%p\n",__func__,__LINE__,*rw);
 		return ;
 	}
-	
+
 	pthread_rwlock_rdlock((pthread_rwlock_t *)(*rw));
 }
 
@@ -329,8 +321,8 @@ int _uhi_rwlock_tryupgrade(uhi_rwlock_t *rw, void *l, const char *file, int line
 
 void _uhi_rwlock_downgrade(uhi_rwlock_t *rw, void *l, const char *file, int line)
 {
-	/* 
-	 * Nothing to do here.  In this implementation, there is only one
+	/*
+	 * Nothing to do here.	In this implementation, there is only one
 	 * grade of this lock.
 	 */
 }
@@ -373,10 +365,9 @@ int ff_usleep(uint32_t usecs)
 
 int linux_open(const char *pathname, int flags, mode_t mode)
 {
-	//printf("flags=%x mode=%x\n",flags,mode);
 	//int fd = open(pathname, O_RDWR|O_CREAT /* flags*/,  777/*mode*/);
 
-	int fd = open(pathname,  flags,  mode);
+	int fd = open(pathname,	 flags,	 mode);
 	return fd;
 }
 
@@ -390,8 +381,8 @@ void ff_thread_set_name(const char *name)
 
 
 /*
- *  prio runs from 0 to 100, with 0 corresponding to the minimum possible
- *  priority and 100 corresponding to the maximum possible priority.
+ *	prio runs from 0 to 100, with 0 corresponding to the minimum possible
+ *	priority and 100 corresponding to the maximum possible priority.
  */
 int uhi_thread_setprio(unsigned int prio)
 {
@@ -400,16 +391,16 @@ int uhi_thread_setprio(unsigned int prio)
 
 	policy = SCHED_OTHER;
 	sparam.sched_priority =
-	    sched_get_priority_min(policy) +
-	    ((sched_get_priority_max(policy) - sched_get_priority_min(policy)) * prio) / 100;
+		sched_get_priority_min(policy) +
+		((sched_get_priority_max(policy) - sched_get_priority_min(policy)) * prio) / 100;
 
 	return (pthread_setschedparam(pthread_self(), policy, &sparam));
 }
 
 
 /*
- *  prio runs from 0 to 100, with 0 corresponding to the minimum possible
- *  priority and 100 corresponding to the maximum possible priority.
+ *	prio runs from 0 to 100, with 0 corresponding to the minimum possible
+ *	priority and 100 corresponding to the maximum possible priority.
  */
 int uhi_thread_setprio_rt(unsigned int prio)
 {
@@ -421,16 +412,16 @@ int uhi_thread_setprio_rt(unsigned int prio)
 
 	policy = SCHED_RR;
 	sparam.sched_priority =
-	    sched_get_priority_min(policy) +
-	    ((sched_get_priority_max(policy) - sched_get_priority_min(policy)) * prio) / 100;
+		sched_get_priority_min(policy) +
+		((sched_get_priority_max(policy) - sched_get_priority_min(policy)) * prio) / 100;
 
 	if (0 != pthread_setschedparam(t, policy, &sparam)) {
 		policy = SCHED_FIFO;
 		sparam.sched_priority =
-		    sched_get_priority_min(policy) +
-		    ((sched_get_priority_max(policy) - sched_get_priority_min(policy)) * prio) / 100;
+			sched_get_priority_min(policy) +
+			((sched_get_priority_max(policy) - sched_get_priority_min(policy)) * prio) / 100;
 
-	        return (pthread_setschedparam(t, policy, &sparam));
+			return (pthread_setschedparam(t, policy, &sparam));
 	}
 
 	return (0);
@@ -446,7 +437,7 @@ static void *pthread_start_routine(void *arg)
 #if 0
 	/*
 	 * uinet_shutdown() waits for a message from the shutdown thread
-	 * indicating shutdown is complete.  If uinet_shutdown() is called
+	 * indicating shutdown is complete.	 If uinet_shutdown() is called
 	 * from a signal handler running in a thread context that is holding
 	 * a lock that the shutdown activity needs to acquire in order to
 	 * complete, deadlock will occur.  Masking all signals in all
@@ -489,8 +480,8 @@ int uhi_thread_create(uhi_thread_t *new_thread, struct uhi_thread_start_args *st
 	pthread_t thread;
 	pthread_attr_t attr;
 
-	
-	pthread_attr_init(&attr); 
+
+	pthread_attr_init(&attr);
 	if (stack_bytes) {
 		pthread_attr_setstacksize(&attr, stack_bytes);
 	}
@@ -502,26 +493,26 @@ int uhi_thread_create(uhi_thread_t *new_thread, struct uhi_thread_start_args *st
 		*new_thread = (uhi_thread_t)thread;
 
 	return (error);
-	
+
 }
 
 
 int rsp_pthread_create(char *name, pthread_t *thread, const pthread_attr_t *attr,
-                          void *(*start_routine) (void *), void *arg)
+						  void *(*start_routine) (void *), void *arg)
 {
 	struct uhi_thread_start_args *tsa;
 	uhi_thread_t host_thread;
 	tsa = malloc(sizeof(struct uhi_thread_start_args));
 	memset(tsa,0,sizeof(struct uhi_thread_start_args));
-	
+
 	tsa->start_routine = start_routine;
 	tsa->start_routine_arg = arg;
 	tsa->end_routine = NULL;
 	strncpy(tsa->name,name,sizeof(tsa->name) - 1);
 
-	
 
-	uhi_thread_create(&host_thread, tsa, 0); 
+
+	uhi_thread_create(&host_thread, tsa, 0);
 
 }
 
@@ -529,57 +520,57 @@ int rsp_pthread_create(char *name, pthread_t *thread, const pthread_attr_t *attr
 void *
 ff_mmap(void *addr, uint64_t len, int prot, int flags, int fd, uint64_t offset)
 {
-    int host_prot;
-    int host_flags;
+	int host_prot;
+	int host_flags;
 
-    assert(ff_PROT_NONE == PROT_NONE);
-    host_prot = 0;
-    if ((prot & ff_PROT_READ) == ff_PROT_READ)   host_prot |= PROT_READ;
-    if ((prot & ff_PROT_WRITE) == ff_PROT_WRITE) host_prot |= PROT_WRITE;
+	assert(ff_PROT_NONE == PROT_NONE);
+	host_prot = 0;
+	if ((prot & ff_PROT_READ) == ff_PROT_READ)	 host_prot |= PROT_READ;
+	if ((prot & ff_PROT_WRITE) == ff_PROT_WRITE) host_prot |= PROT_WRITE;
 
-    host_flags = 0;
-    if ((flags & ff_MAP_SHARED) == ff_MAP_SHARED)   host_flags |= MAP_SHARED;
-    if ((flags & ff_MAP_PRIVATE) == ff_MAP_PRIVATE) host_flags |= MAP_PRIVATE;
-    if ((flags & ff_MAP_ANON) == ff_MAP_ANON)       host_flags |= MAP_ANON;
+	host_flags = 0;
+	if ((flags & ff_MAP_SHARED) == ff_MAP_SHARED)	host_flags |= MAP_SHARED;
+	if ((flags & ff_MAP_PRIVATE) == ff_MAP_PRIVATE) host_flags |= MAP_PRIVATE;
+	if ((flags & ff_MAP_ANON) == ff_MAP_ANON)		host_flags |= MAP_ANON;
 
-    void *ret = (mmap(addr, len, host_prot, host_flags, fd, offset));
+	void *ret = (mmap(addr, len, host_prot, host_flags, fd, offset));
 
-    if (ret == (void *) -1) {
-        printf("fst mmap failed:%s\n", strerror(errno));
-        exit(1);
-    }
-    return ret;
+	if (ret == (void *) -1) {
+		printf("fst mmap failed:%s\n", strerror(errno));
+		exit(1);
+	}
+	return ret;
 }
 
 int
 ff_munmap(void *addr, uint64_t len)
 {
-    return (munmap(addr, len));
+	return (munmap(addr, len));
 }
 
 
 void *
 ff_malloc(unsigned long size)
 {
-    return (malloc(size));
+	return (malloc(size));
 }
 
 
 void *
 ff_calloc(unsigned long number, unsigned long size)
 {
-    return (calloc(number, size));
+	return (calloc(number, size));
 }
 
 
 void *
 ff_realloc(void *p, unsigned long size)
 {
-    if (size) {
-        return (realloc(p, size));
-    }
+	if (size) {
+		return (realloc(p, size));
+	}
 
-    return (p);
+	return (p);
 }
 
 void *rsp_malloc(unsigned long size)
@@ -587,7 +578,7 @@ void *rsp_malloc(unsigned long size)
 	void *alloc;
 
 	alloc = malloc(size);
-      
+
 	if(alloc)
 		bzero(alloc, size);
 	return (alloc);
@@ -595,7 +586,7 @@ void *rsp_malloc(unsigned long size)
 
 void *rsp_calloc(unsigned long number, unsigned long size)
 {
-    return (calloc(number, size));
+	return (calloc(number, size));
 }
 
 
@@ -608,7 +599,7 @@ void *rsp_free(void *p)
 void
 ff_free(void *p)
 {
-    free(p);
+	free(p);
 }
 
 void panic(const char *, ...) __attribute__((__noreturn__));
@@ -618,88 +609,88 @@ const char *panicstr = NULL;
 void
 panic(const char *fmt, ...)
 {
-    va_list ap;
+	va_list ap;
 
-    va_start(ap, fmt);
-    //vprintf(fmt, ap);
+	va_start(ap, fmt);
+	//vprintf(fmt, ap);
 	printf(fmt, ap);
-    va_end(ap);
+	va_end(ap);
 
-    abort();
+	abort();
 }
 
 void
 ff_clock_gettime(int id, int64_t *sec, long *nsec)
 {
-    struct timespec ts;
-    int host_id;
-    int rv;
+	struct timespec ts;
+	int host_id;
+	int rv;
 
-    switch (id) {
-    case ff_CLOCK_REALTIME:
-        host_id = CLOCK_REALTIME;
-        break;
+	switch (id) {
+	case ff_CLOCK_REALTIME:
+		host_id = CLOCK_REALTIME;
+		break;
 #ifdef CLOCK_MONOTONIC_FAST
-    case ff_CLOCK_MONOTONIC_FAST:
-        host_id = CLOCK_MONOTONIC_FAST;
-        break;
+	case ff_CLOCK_MONOTONIC_FAST:
+		host_id = CLOCK_MONOTONIC_FAST;
+		break;
 #endif
-    case ff_CLOCK_MONOTONIC:
-    default:
-        host_id = CLOCK_MONOTONIC;
-        break;
-    }
+	case ff_CLOCK_MONOTONIC:
+	default:
+		host_id = CLOCK_MONOTONIC;
+		break;
+	}
 
-    rv = clock_gettime(host_id, &ts);
-    assert(0 == rv);
+	rv = clock_gettime(host_id, &ts);
+	assert(0 == rv);
 
-    *sec = (int64_t)ts.tv_sec;
-    *nsec = (long)ts.tv_nsec;
+	*sec = (int64_t)ts.tv_sec;
+	*nsec = (long)ts.tv_nsec;
 }
 
 uint64_t
 ff_clock_gettime_ns(int id)
 {
-    int64_t sec;
-    long nsec;
+	int64_t sec;
+	long nsec;
 
-    ff_clock_gettime(id, &sec, &nsec);
+	ff_clock_gettime(id, &sec, &nsec);
 
-    return ((uint64_t)sec * ff_NSEC_PER_SEC + nsec);
+	return ((uint64_t)sec * ff_NSEC_PER_SEC + nsec);
 }
 
 void
 ff_get_current_time(time_t *sec, long *nsec)
 {
-    if (sec) {
-        *sec = current_ts.tv_sec;
-    }
+	if (sec) {
+		*sec = current_ts.tv_sec;
+	}
 
-    if (nsec) {
-        *nsec = current_ts.tv_nsec;
-    }
+	if (nsec) {
+		*nsec = current_ts.tv_nsec;
+	}
 }
 
 void
 ff_update_current_ts()
 {
-    int rv = clock_gettime(CLOCK_REALTIME, &current_ts);
-    assert(rv == 0);
+	int rv = clock_gettime(CLOCK_REALTIME, &current_ts);
+	assert(rv == 0);
 }
 
 int get_random(void *ptr, unsigned int len)
-{     
-	int fd = -1; 
+{
+	int fd = -1;
 	unsigned int seed = 0;
 	int size;
-	fd = open ("/dev/urandom", O_RDONLY);    
-	if (fd < 0)     
-	{        
-		printf("Can not open /dev/urandom\n");        
-		return -1;    
-	}   
-	else    
-	{      
+	fd = open ("/dev/urandom", O_RDONLY);
+	if (fd < 0)
+	{
+		printf("Can not open /dev/urandom\n");
+		return -1;
+	}
+	else
+	{
 		size = read(fd, ptr, len);
 		close(fd);
 	}
@@ -711,122 +702,123 @@ int get_random(void *ptr, unsigned int len)
 void
 ff_arc4rand(void *ptr, unsigned int len, int reseed)
 {
-    (void)reseed;
+	(void)reseed;
 
-    //RAND_bytes(ptr, len);
-    get_random(ptr, len);
+	//RAND_bytes(ptr, len);
+	get_random(ptr, len);
 }
 
 uint32_t
 ff_arc4random(void)
 {
-    uint32_t ret;
-    ff_arc4rand(&ret, sizeof ret, 0);
-    return ret;
+	uint32_t ret;
+	ff_arc4rand(&ret, sizeof ret, 0);
+	return ret;
 }
 
 int ff_setenv(const char *name, const char *value)
 {
-    return setenv(name, value, 1);
+	return setenv(name, value, 1);
 }
 
 char *ff_getenv(const char *name)
 {
-    return getenv(name);
+	return getenv(name);
 }
 
 void ff_os_errno(int error)
 {
-    switch (error) {
-        case ff_EPERM:       errno = EPERM; break;
-        case ff_ENOENT:      errno = ENOENT; break;
-        case ff_ESRCH:       errno = ESRCH; break;
-        case ff_EINTR:       errno = EINTR; break;
-        case ff_EIO:         errno = EIO; break;
-        case ff_ENXIO:       errno = ENXIO; break;
-        case ff_E2BIG:       errno = E2BIG; break;
-        case ff_ENOEXEC:     errno = ENOEXEC; break;
-        case ff_EBADF:       errno = EBADF; break;
-        case ff_ECHILD:      errno = ECHILD; break;
-        case ff_EDEADLK:     errno = EDEADLK; break;
-        case ff_ENOMEM:      errno = ENOMEM; break;
-        case ff_EACCES:      errno = EACCES; break;
-        case ff_EFAULT:      errno = EFAULT; break;
-        case ff_ENOTBLK:     errno = ENOTBLK; break;
-        case ff_EBUSY:       errno = EBUSY; break;
-        case ff_EEXIST:      errno = EEXIST; break;
-        case ff_EXDEV:       errno = EXDEV; break;
-        case ff_ENODEV:      errno = ENODEV; break;
-        case ff_ENOTDIR:     errno = ENOTDIR; break;
-        case ff_EISDIR:      errno = EISDIR; break;
-        case ff_EINVAL:      errno = EINVAL; break;
-        case ff_ENFILE:      errno = ENFILE; break;
-        case ff_EMFILE:      errno = EMFILE; break;
-        case ff_ENOTTY:      errno = ENOTTY; break;
-        case ff_ETXTBSY:     errno = ETXTBSY; break;
-        case ff_EFBIG:       errno = EFBIG; break;
-        case ff_ENOSPC:      errno = ENOSPC; break;
-        case ff_ESPIPE:      errno = ESPIPE; break;
-        case ff_EROFS:       errno = EROFS; break;
-        case ff_EMLINK:      errno = EMLINK; break;
-        case ff_EPIPE:       errno = EPIPE; break;
-        case ff_EDOM:        errno = EDOM; break;
-        case ff_ERANGE:      errno = ERANGE; break;
-    
-        /* case ff_EAGAIN:       same as EWOULDBLOCK */
-        case ff_EWOULDBLOCK:     errno = EWOULDBLOCK; break;
-    
-        case ff_EINPROGRESS:     errno = EINPROGRESS; break;
-        case ff_EALREADY:        errno = EALREADY; break;
-        case ff_ENOTSOCK:        errno = ENOTSOCK; break;
-        case ff_EDESTADDRREQ:    errno = EDESTADDRREQ; break;
-        case ff_EMSGSIZE:        errno = EMSGSIZE; break;
-        case ff_EPROTOTYPE:      errno = EPROTOTYPE; break;
-        case ff_ENOPROTOOPT:     errno = ENOPROTOOPT; break;
-        case ff_EPROTONOSUPPORT: errno = EPROTONOSUPPORT; break;
-        case ff_ESOCKTNOSUPPORT: errno = ESOCKTNOSUPPORT; break;
+	switch (error) 
+	{
+		case ff_EPERM:		 errno = EPERM; break;
+		case ff_ENOENT:		 errno = ENOENT; break;
+		case ff_ESRCH:		 errno = ESRCH; break;
+		case ff_EINTR:		 errno = EINTR; break;
+		case ff_EIO:		 errno = EIO; break;
+		case ff_ENXIO:		 errno = ENXIO; break;
+		case ff_E2BIG:		 errno = E2BIG; break;
+		case ff_ENOEXEC:	 errno = ENOEXEC; break;
+		case ff_EBADF:		 errno = EBADF; break;
+		case ff_ECHILD:		 errno = ECHILD; break;
+		case ff_EDEADLK:	 errno = EDEADLK; break;
+		case ff_ENOMEM:		 errno = ENOMEM; break;
+		case ff_EACCES:		 errno = EACCES; break;
+		case ff_EFAULT:		 errno = EFAULT; break;
+		case ff_ENOTBLK:	 errno = ENOTBLK; break;
+		case ff_EBUSY:		 errno = EBUSY; break;
+		case ff_EEXIST:		 errno = EEXIST; break;
+		case ff_EXDEV:		 errno = EXDEV; break;
+		case ff_ENODEV:		 errno = ENODEV; break;
+		case ff_ENOTDIR:	 errno = ENOTDIR; break;
+		case ff_EISDIR:		 errno = EISDIR; break;
+		case ff_EINVAL:		 errno = EINVAL; break;
+		case ff_ENFILE:		 errno = ENFILE; break;
+		case ff_EMFILE:		 errno = EMFILE; break;
+		case ff_ENOTTY:		 errno = ENOTTY; break;
+		case ff_ETXTBSY:	 errno = ETXTBSY; break;
+		case ff_EFBIG:		 errno = EFBIG; break;
+		case ff_ENOSPC:		 errno = ENOSPC; break;
+		case ff_ESPIPE:		 errno = ESPIPE; break;
+		case ff_EROFS:		 errno = EROFS; break;
+		case ff_EMLINK:		 errno = EMLINK; break;
+		case ff_EPIPE:		 errno = EPIPE; break;
+		case ff_EDOM:		 errno = EDOM; break;
+		case ff_ERANGE:		 errno = ERANGE; break;
 
-        /* case ff_EOPNOTSUPP:   same as ENOTSUP */
-        case ff_ENOTSUP:         errno = ENOTSUP; break;
+		/* case ff_EAGAIN:		 same as EWOULDBLOCK */
+		case ff_EWOULDBLOCK:	 errno = EWOULDBLOCK; break;
 
-        case ff_EPFNOSUPPORT:    errno = EPFNOSUPPORT; break;
-        case ff_EAFNOSUPPORT:    errno = EAFNOSUPPORT; break;
-        case ff_EADDRINUSE:      errno = EADDRINUSE; break;
-        case ff_EADDRNOTAVAIL:   errno = EADDRNOTAVAIL; break;
-        case ff_ENETDOWN:        errno = ENETDOWN; break;
-        case ff_ENETUNREACH:     errno = ENETUNREACH; break;
-        case ff_ENETRESET:       errno = ENETRESET; break;
-        case ff_ECONNABORTED:    errno = ECONNABORTED; break;
-        case ff_ECONNRESET:      errno = ECONNRESET; break;
-        case ff_ENOBUFS:         errno = ENOBUFS; break;
-        case ff_EISCONN:         errno = EISCONN; break;
-        case ff_ENOTCONN:        errno = ENOTCONN; break;
-        case ff_ESHUTDOWN:       errno = ESHUTDOWN; break;
-        case ff_ETOOMANYREFS:    errno = ETOOMANYREFS; break;
-        case ff_ETIMEDOUT:       errno = ETIMEDOUT; break;
-        case ff_ECONNREFUSED:    errno = ECONNREFUSED; break;
-        case ff_ELOOP:           errno = ELOOP; break;
-        case ff_ENAMETOOLONG:    errno = ENAMETOOLONG; break;
-        case ff_EHOSTDOWN:       errno = EHOSTDOWN; break;
-        case ff_EHOSTUNREACH:    errno = EHOSTUNREACH; break;
-        case ff_ENOTEMPTY:       errno = ENOTEMPTY; break;
-        case ff_EUSERS:      errno = EUSERS; break;
-        case ff_EDQUOT:      errno = EDQUOT; break;
-        case ff_ESTALE:      errno = ESTALE; break;
-        case ff_EREMOTE:     errno = EREMOTE; break;
-        case ff_ENOLCK:      errno = ENOLCK; break;
-        case ff_ENOSYS:      errno = ENOSYS; break;
-        case ff_EIDRM:       errno = EIDRM; break;
-        case ff_ENOMSG:      errno = ENOMSG; break;
-        case ff_EOVERFLOW:   errno = EOVERFLOW; break;
-        case ff_ECANCELED:   errno = ECANCELED; break;
-        case ff_EILSEQ:      errno = EILSEQ; break;
-        case ff_EBADMSG:     errno = EBADMSG; break;
-        case ff_EMULTIHOP:   errno = EMULTIHOP; break;
-        case ff_ENOLINK:     errno = ENOLINK; break;
-        case ff_EPROTO:      errno = EPROTO; break;
-        default:              errno = error; break;
-    }
+		case ff_EINPROGRESS:	 errno = EINPROGRESS; break;
+		case ff_EALREADY:		 errno = EALREADY; break;
+		case ff_ENOTSOCK:		 errno = ENOTSOCK; break;
+		case ff_EDESTADDRREQ:	 errno = EDESTADDRREQ; break;
+		case ff_EMSGSIZE:		 errno = EMSGSIZE; break;
+		case ff_EPROTOTYPE:		 errno = EPROTOTYPE; break;
+		case ff_ENOPROTOOPT:	 errno = ENOPROTOOPT; break;
+		case ff_EPROTONOSUPPORT: errno = EPROTONOSUPPORT; break;
+		case ff_ESOCKTNOSUPPORT: errno = ESOCKTNOSUPPORT; break;
+
+		/* case ff_EOPNOTSUPP:	 same as ENOTSUP */
+		case ff_ENOTSUP:		 errno = ENOTSUP; break;
+
+		case ff_EPFNOSUPPORT:	 errno = EPFNOSUPPORT; break;
+		case ff_EAFNOSUPPORT:	 errno = EAFNOSUPPORT; break;
+		case ff_EADDRINUSE:		 errno = EADDRINUSE; break;
+		case ff_EADDRNOTAVAIL:	 errno = EADDRNOTAVAIL; break;
+		case ff_ENETDOWN:		 errno = ENETDOWN; break;
+		case ff_ENETUNREACH:	 errno = ENETUNREACH; break;
+		case ff_ENETRESET:		 errno = ENETRESET; break;
+		case ff_ECONNABORTED:	 errno = ECONNABORTED; break;
+		case ff_ECONNRESET:		 errno = ECONNRESET; break;
+		case ff_ENOBUFS:		 errno = ENOBUFS; break;
+		case ff_EISCONN:		 errno = EISCONN; break;
+		case ff_ENOTCONN:		 errno = ENOTCONN; break;
+		case ff_ESHUTDOWN:		 errno = ESHUTDOWN; break;
+		case ff_ETOOMANYREFS:	 errno = ETOOMANYREFS; break;
+		case ff_ETIMEDOUT:		 errno = ETIMEDOUT; break;
+		case ff_ECONNREFUSED:	 errno = ECONNREFUSED; break;
+		case ff_ELOOP:			 errno = ELOOP; break;
+		case ff_ENAMETOOLONG:	 errno = ENAMETOOLONG; break;
+		case ff_EHOSTDOWN:		 errno = EHOSTDOWN; break;
+		case ff_EHOSTUNREACH:	 errno = EHOSTUNREACH; break;
+		case ff_ENOTEMPTY:		 errno = ENOTEMPTY; break;
+		case ff_EUSERS:		 errno = EUSERS; break;
+		case ff_EDQUOT:		 errno = EDQUOT; break;
+		case ff_ESTALE:		 errno = ESTALE; break;
+		case ff_EREMOTE:	 errno = EREMOTE; break;
+		case ff_ENOLCK:		 errno = ENOLCK; break;
+		case ff_ENOSYS:		 errno = ENOSYS; break;
+		case ff_EIDRM:		 errno = EIDRM; break;
+		case ff_ENOMSG:		 errno = ENOMSG; break;
+		case ff_EOVERFLOW:	 errno = EOVERFLOW; break;
+		case ff_ECANCELED:	 errno = ECANCELED; break;
+		case ff_EILSEQ:		 errno = EILSEQ; break;
+		case ff_EBADMSG:	 errno = EBADMSG; break;
+		case ff_EMULTIHOP:	 errno = EMULTIHOP; break;
+		case ff_ENOLINK:	 errno = ENOLINK; break;
+		case ff_EPROTO:		 errno = EPROTO; break;
+		default:			  errno = error; break;
+	}
 
 }
 

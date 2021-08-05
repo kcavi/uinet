@@ -65,48 +65,48 @@ char html[] =
 
 int kevent_loop(void *arg)
 {
-    /* Wait for events to happen */
-    unsigned nevents = ff_kevent(kq, NULL, 0, events, MAX_EVENTS, NULL);
-    unsigned i;
+	/* Wait for events to happen */
+	unsigned nevents = ff_kevent(kq, NULL, 0, events, MAX_EVENTS, NULL);
+	unsigned i;
 
-    for (i = 0; i < nevents; ++i) {
-        struct kevent event = events[i];
-        int clientfd = (int)event.ident;
+	for (i = 0; i < nevents; ++i) {
+		struct kevent event = events[i];
+		int clientfd = (int)event.ident;
 
-        /* Handle disconnect */
-        if (event.flags & EV_EOF) {
-            /* Simply close socket */
-            rsp_close(clientfd);
-        } else if (clientfd == sockfd) {
-            int available = (int)event.data;
-            do {
-                int nclientfd = rsp_accept(sockfd, NULL, NULL);
-                if (nclientfd < 0) {
-                    printf("rsp_accept failed:%d, %s\n", errno,
-                        strerror(errno));
-                    break;
-                }
+		/* Handle disconnect */
+		if (event.flags & EV_EOF) {
+			/* Simply close socket */
+			rsp_close(clientfd);
+		} else if (clientfd == sockfd) {
+			int available = (int)event.data;
+			do {
+				int nclientfd = rsp_accept(sockfd, NULL, NULL);
+				if (nclientfd < 0) {
+					printf("rsp_accept failed:%d, %s\n", errno,
+						strerror(errno));
+					break;
+				}
 
-                /* Add to event list */
-                EV_SET(&kevSet, nclientfd, EVFILT_READ, EV_ADD, 0, 0, NULL);
+				/* Add to event list */
+				EV_SET(&kevSet, nclientfd, EVFILT_READ, EV_ADD, 0, 0, NULL);
 
-                if(ff_kevent(kq, &kevSet, 1, NULL, 0, NULL) < 0) {
-                    printf("ff_kevent error:%d, %s\n", errno,
-                        strerror(errno));
-                    return -1;
-                }
+				if(ff_kevent(kq, &kevSet, 1, NULL, 0, NULL) < 0) {
+					printf("ff_kevent error:%d, %s\n", errno,
+						strerror(errno));
+					return -1;
+				}
 
-                available--;
-            } while (available);
-        } else if (event.filter == EVFILT_READ) {
-            char buf[256];
-            size_t readlen = rsp_read(clientfd, buf, sizeof(buf));
+				available--;
+			} while (available);
+		} else if (event.filter == EVFILT_READ) {
+			char buf[256];
+			size_t readlen = rsp_read(clientfd, buf, sizeof(buf));
 
-            rsp_write(clientfd, html, sizeof(html));
-        } else {
-            printf("unknown event: %8.8X\n", event.flags);
-        }
-    }
+			rsp_write(clientfd, html, sizeof(html));
+		} else {
+			printf("unknown event: %8.8X\n", event.flags);
+		}
+	}
 }
 int kevent_test()
 {
@@ -126,18 +126,18 @@ int kevent_test()
 
 int tcp_html_select_loop(int fd)
 {
-    unsigned i;
-    struct timeval waittime;
-    rsp_fd_set rset;
+	unsigned i;
+	struct timeval waittime;
+	rsp_fd_set rset;
 	int ret;
 	int clientfd = 0;
 	char buf[256];
-    int maxfd = fd; 
-    RSP_FD_ZERO(&rset);	
-    RSP_FD_SET(fd, &rset);
+	int maxfd = fd; 
+	RSP_FD_ZERO(&rset);	
+	RSP_FD_SET(fd, &rset);
 
 	while (1)		 
-    {	  
+	{	  
 		waittime.tv_sec	= 10;		   
 		waittime.tv_usec = 0;
 		RSP_FD_ZERO(&rset);	
@@ -149,40 +149,40 @@ int tcp_html_select_loop(int fd)
 		{
 			if(RSP_FD_ISSET(fd,&rset))
 			{
-                int clientfd1 = rsp_accept(fd, NULL, NULL);
-                if (clientfd1 < 0) 
+				int clientfd1 = rsp_accept(fd, NULL, NULL);
+				if (clientfd1 < 0) 
 				{
-                    printf("rsp_accept failed:%d, %s\n", errno,strerror(errno));
-                    break;
-                }
+					printf("rsp_accept failed:%d, %s\n", errno,strerror(errno));
+					break;
+				}
 
-            	size_t readlen = rsp_read(clientfd1, buf, sizeof(buf));
+				size_t readlen = rsp_read(clientfd1, buf, sizeof(buf));
 
-            	rsp_write(clientfd1, html, sizeof(html));
+				rsp_write(clientfd1, html, sizeof(html));
 				rsp_close(clientfd1);
 				
 			}
-    	}
+		}
 	}
 }
 
 
 int tcp_echo_select_loop(int fd)
 {
-    unsigned i;
-    struct timeval waittime;
-    rsp_fd_set rset;
+	unsigned i;
+	struct timeval waittime;
+	rsp_fd_set rset;
 	int ret;
 	int clientfd = 0;
-    RSP_FD_ZERO(&rset);	
-    RSP_FD_SET(fd, &rset);	
-    int maxfd=fd; 
+	RSP_FD_ZERO(&rset);
+	RSP_FD_SET(fd, &rset);
+	int maxfd=fd; 
 	char buf[2560];
 
 
-	while (1)		 
-    {	  
-		waittime.tv_sec	= 10;		   
+	while (1)
+	{	  
+		waittime.tv_sec	= 10;
 		waittime.tv_usec = 0;
 		RSP_FD_ZERO(&rset);	
 		RSP_FD_SET(fd, &rset);
@@ -199,12 +199,12 @@ int tcp_echo_select_loop(int fd)
 			if(RSP_FD_ISSET(fd,&rset))
 			{
 				printf("%s %d\n",__func__,__LINE__);
-                clientfd = rsp_accept(fd, NULL, NULL);
-                if (clientfd < 0) 
+				clientfd = rsp_accept(fd, NULL, NULL);
+				if (clientfd < 0) 
 				{
-                    printf("rsp_accept failed:%d, %s\n", errno,strerror(errno));
-                    break;
-                }
+					printf("rsp_accept failed:%d, %s\n", errno,strerror(errno));
+					break;
+				}
 
 				printf("%s %d clientfd=%d\n",__func__,__LINE__,clientfd);
 				
@@ -212,17 +212,17 @@ int tcp_echo_select_loop(int fd)
 
 			if(RSP_FD_ISSET(clientfd,&rset))
 			{
-            	size_t readlen = rsp_read(clientfd, buf, sizeof(buf));
+				size_t readlen = rsp_read(clientfd, buf, sizeof(buf));
 				if(readlen <= 0)
 				{
 					rsp_close(clientfd);
 					clientfd = 0;
 					continue;
 				}
-            	rsp_write(clientfd, buf, readlen);
+				rsp_write(clientfd, buf, readlen);
 				
-        	} 
-    	}
+			} 
+		}
 	}
 }
 
@@ -230,31 +230,31 @@ int tcp_echo_select_loop(int fd)
 
 int loop_udp1(int fd)
 {
-    /* Wait for events to happen */
-    unsigned nevents = ff_kevent(kq, NULL, 0, events, MAX_EVENTS, NULL);
-    unsigned i,j;
+	/* Wait for events to happen */
+	unsigned nevents = ff_kevent(kq, NULL, 0, events, MAX_EVENTS, NULL);
+	unsigned i,j;
 	struct rsp_sockaddr from;
 	socklen_t fromlen=sizeof(from);
 
-    for (i = 0; i < nevents; ++i) {
-        struct kevent event = events[i];
-        int clientfd = (int)event.ident;
+	for (i = 0; i < nevents; ++i) {
+		struct kevent event = events[i];
+		int clientfd = (int)event.ident;
 		printf("clientfd=%d\n",clientfd);
 
-        if (event.filter == EVFILT_READ) {
-            char buf[256];
-            size_t readlen = rsp_recvfrom(clientfd, buf, sizeof(buf),0, &from, &fromlen);
+		if (event.filter == EVFILT_READ) {
+			char buf[256];
+			size_t readlen = rsp_recvfrom(clientfd, buf, sizeof(buf),0, &from, &fromlen);
 			printf("loop_udp recv packet:\n");
 
-            for(j=0;j<readlen;j++)
-                printf("%02x ",buf[j]);
-            printf("\n");
+			for(j=0;j<readlen;j++)
+				printf("%02x ",buf[j]);
+			printf("\n");
 			
-            rsp_sendto(clientfd, buf, readlen,0, &from, fromlen);
-        } else {
-            printf("unknown event: %8.8X\n", event.flags);
-        }
-    }
+			rsp_sendto(clientfd, buf, readlen,0, &from, fromlen);
+		} else {
+			printf("unknown event: %8.8X\n", event.flags);
+		}
+	}
 }
 
 
@@ -285,34 +285,34 @@ void *udp_socket_test(void *arg)
 	int on = 1;
 
 	ff_th_init("udp_socket_test");
-    int sockfd = rsp_socket(RSP_AF_INET, RSP_SOCK_DGRAM, 0);
-    printf("sockfd:%d\n", sockfd);
-    if (sockfd < 0) {
-        printf("rsp_socket failed\n");
-        exit(1);
-    }
+	int sockfd = rsp_socket(RSP_AF_INET, RSP_SOCK_DGRAM, 0);
+	printf("sockfd:%d\n", sockfd);
+	if (sockfd < 0) {
+		printf("rsp_socket failed\n");
+		exit(1);
+	}
 
-    struct rsp_sockaddr_in my_addr;
-    bzero(&my_addr, sizeof(my_addr));
+	struct rsp_sockaddr_in my_addr;
+	bzero(&my_addr, sizeof(my_addr));
 	my_addr.sin_len = sizeof(my_addr);
-    my_addr.sin_family = RSP_AF_INET;
-    my_addr.sin_port = htons(8010);
-    my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	my_addr.sin_family = RSP_AF_INET;
+	my_addr.sin_port = htons(8010);
+	my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 	rsp_setsockopt (sockfd, RSP_SOL_SOCKET, RSP_SO_REUSEPORT,(char *) &on, sizeof (on));		
 
-    int ret = rsp_bind(sockfd, (struct rsp_sockaddr *)&my_addr, sizeof(my_addr));
-    if (ret < 0) {
-        printf("udp_socket_test rsp_bind failed ret=%d\n",ret);
-        exit(1);
-    }
+	int ret = rsp_bind(sockfd, (struct rsp_sockaddr *)&my_addr, sizeof(my_addr));
+	if (ret < 0) {
+		printf("udp_socket_test rsp_bind failed ret=%d\n",ret);
+		exit(1);
+	}
 	
 
-    while(1)
-    {
-        loop_udp(sockfd);
-    }
-    return 0;
+	while(1)
+	{
+		loop_udp(sockfd);
+	}
+	return 0;
 }
 
 void *rtsocket_test(void *arg)
@@ -321,8 +321,8 @@ void *rtsocket_test(void *arg)
 	socklen_t fromlen=sizeof(from);
 	char buf[2560];
 	unsigned i;
-    struct timeval waittime;
-    rsp_fd_set rset;
+	struct timeval waittime;
+	rsp_fd_set rset;
 	int ret;
 	int clientfd = 0;
 	int maxfd;
@@ -330,7 +330,7 @@ void *rtsocket_test(void *arg)
 	struct rsp_sockaddr_nl rtAddr;
 
 	ff_th_init("rtsocket_test");
-    
+	
 	int rtsockfd = rsp_socket(RSP_AF_NETLINK, RSP_SOCK_RAW, NETLINK_ROUTE);
 	if (rtsockfd < 0) 
 	{
@@ -371,8 +371,8 @@ void *open_test(void *arg)
 	socklen_t fromlen=sizeof(from);
 	char buf[256];
 	unsigned i;
-    struct timeval waittime;
-    rsp_fd_set rset;
+	struct timeval waittime;
+	rsp_fd_set rset;
 	int ret;
 	int clientfd = 0;
 	int maxfd;
@@ -418,8 +418,8 @@ void *pty_read_test(void *arg)
 	socklen_t fromlen=sizeof(from);
 	char buf[2560];
 	unsigned i;
-    struct timeval waittime;
-    rsp_fd_set rset;
+	struct timeval waittime;
+	rsp_fd_set rset;
 	int ret;
 	int clientfd = 0;
 	int maxfd;
@@ -460,7 +460,7 @@ void *pty_read_test(void *arg)
 
 
 void *vty_main_loop(void *arg)
-{	
+{
 	struct timeval timer_now;
 	struct timeval *timer_wait;
 	int ret;
@@ -525,33 +525,33 @@ void vty_sock_serv()
 	ff_th_init("vty_sock_serv");
 	
 	int sockfd = rsp_socket(RSP_AF_INET, RSP_SOCK_STREAM, 0);
-    printf("tcp_echo_test sockfd:%d\n", sockfd);
-    if (sockfd < 0) 
+	printf("tcp_echo_test sockfd:%d\n", sockfd);
+	if (sockfd < 0) 
 	{
-        printf("rsp_socket failed\n");
-        return;
-    }
+		printf("rsp_socket failed\n");
+		return;
+	}
 
-    struct rsp_sockaddr_in my_addr;
-    bzero(&my_addr, sizeof(my_addr));
+	struct rsp_sockaddr_in my_addr;
+	bzero(&my_addr, sizeof(my_addr));
 	my_addr.sin_len = sizeof(my_addr);
-    my_addr.sin_family = RSP_AF_INET;
-    my_addr.sin_port = htons(23);
-    my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	my_addr.sin_family = RSP_AF_INET;
+	my_addr.sin_port = htons(23);
+	my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    ret = rsp_bind(sockfd, (struct rsp_sockaddr *)&my_addr, sizeof(my_addr));
-    if (ret < 0) 
+	ret = rsp_bind(sockfd, (struct rsp_sockaddr *)&my_addr, sizeof(my_addr));
+	if (ret < 0) 
 	{
-        printf("rsp_bind failed\n");
-        return;
-    }
+		printf("rsp_bind failed\n");
+		return;
+	}
 
-    ret = rsp_listen(sockfd, MAX_EVENTS);
-    if (ret < 0) 
+	ret = rsp_listen(sockfd, MAX_EVENTS);
+	if (ret < 0) 
 	{
-        printf("rsp_listen failed\n");
-        return;
-    }
+		printf("rsp_listen failed\n");
+		return;
+	}
 
 
 	fd = rsp_accept(sockfd, NULL, NULL);
@@ -637,8 +637,8 @@ void *pty_select_read_test(void *arg)
 	socklen_t fromlen=sizeof(from);
 	unsigned char buf[2560];
 	unsigned i;
-    struct timeval waittime;
-    rsp_fd_set rset;
+	struct timeval waittime;
+	rsp_fd_set rset;
 	int ret;
 	int clientfd = 0;
 	int maxfd;
@@ -690,8 +690,8 @@ void *pty_write_test(void *arg)
 	socklen_t fromlen=sizeof(from);
 	char buf[2560] = "11111111111";
 	unsigned i;
-    struct timeval waittime;
-    rsp_fd_set rset;
+	struct timeval waittime;
+	rsp_fd_set rset;
 	int ret;
 	int clientfd = 0;
 	int maxfd;
@@ -724,8 +724,8 @@ void *unix_client_test(void *arg)
 	char msg[128]="123456666666666";
 	char buf[2560];
 	unsigned i;
-    struct timeval waittime;
-    rsp_fd_set rset;
+	struct timeval waittime;
+	rsp_fd_set rset;
 	int ret;
 	int clientfd = 0;
 	int maxfd;
@@ -771,8 +771,8 @@ void *unix_server_test(void *arg)
 	socklen_t addrlen=sizeof(cmdAddr);
 	char buf[1024];
 	unsigned i;
-    struct timeval waittime;
-    rsp_fd_set rset;
+	struct timeval waittime;
+	rsp_fd_set rset;
 	int ret;
 	int clientfd = 0;
 	int maxfd;
@@ -780,7 +780,7 @@ void *unix_server_test(void *arg)
 #define UNIX_TEST_SOCKET_PATH		"/tmp/albCmd.socket"
 
 	ff_th_init("unix_server_test");
-    
+	
 	int unixsockfd = rsp_socket(RSP_AF_UNIX, RSP_SOCK_DGRAM, 0);
 	if (unixsockfd < 0) 
 	{
@@ -823,8 +823,8 @@ void *unix_tcp_client_test(void *arg)
 	char msg[128]="123456666666666";
 	char buf[2560];
 	unsigned i;
-    struct timeval waittime;
-    rsp_fd_set rset;
+	struct timeval waittime;
+	rsp_fd_set rset;
 	int ret;
 	int clientfd = 0;
 	int maxfd;
@@ -882,8 +882,8 @@ void *unix_tcp_server_test(void *arg)
 	socklen_t addrlen=sizeof(cmdAddr);
 	char buf[1024];
 	unsigned i;
-    struct timeval waittime;
-    rsp_fd_set rset;
+	struct timeval waittime;
+	rsp_fd_set rset;
 	int ret;
 	int clientfd = 0;
 	int maxfd;
@@ -891,7 +891,7 @@ void *unix_tcp_server_test(void *arg)
 #define UNIX_TEST_SOCKET_PATH		"/tmp/albCmd.socket"
 
 	ff_th_init("unix_server_test");
-    
+
 	int unixsockfd = rsp_socket(RSP_AF_UNIX, RSP_SOCK_STREAM, 0);
 	if (unixsockfd < 0) 
 	{
@@ -916,11 +916,11 @@ void *unix_tcp_server_test(void *arg)
 	}
 
 	ret = rsp_listen(unixsockfd, 10);
-    if (ret < 0) 
+	if (ret < 0) 
 	{
-        printf("rsp_listen failed\n");
-        return NULL;
-    }
+		printf("rsp_listen failed\n");
+		return NULL;
+	}
 	
 	tcp_echo_select_loop(unixsockfd);
 	return NULL;
@@ -942,22 +942,22 @@ void *ipv6_udp_server_test(void *arg)
 	char buf[2560] = {0};
 	char addr_rcv[256] = {0};
 	unsigned i;
-    struct timeval waittime;
-    rsp_fd_set rset;
+	struct timeval waittime;
+	rsp_fd_set rset;
 	int ret;
 	int clientfd = 0;
 	int maxfd;
 	int readlen;
 	socklen_t addr_len;
-	    
-    int ipv6sockfd = rsp_socket(RSP_AF_INET6, RSP_SOCK_DGRAM, 0);
-    if (ipv6sockfd < 0) 
+		
+	int ipv6sockfd = rsp_socket(RSP_AF_INET6, RSP_SOCK_DGRAM, 0);
+	if (ipv6sockfd < 0) 
 	{
-        printf("ipv6_socket failed\n");
+		printf("ipv6_socket failed\n");
 		perror("error:");
 		printf("errno:%d\n",errno);
-        return NULL;
-    }
+		return NULL;
+	}
 
 
 	printf("ipv6 server sockfd:%d\n", ipv6sockfd);
@@ -1003,23 +1003,23 @@ void *ipv6_udp_client_test(void *arg)
 	char msg[128] = "ipv6 msg";
 	char addr_rcv[256] = {0};
 	unsigned i;
-    struct timeval waittime;
-    rsp_fd_set rset;
+	struct timeval waittime;
+	rsp_fd_set rset;
 	int ret;
 	int clientfd = 0;
 	int maxfd;
 	int readlen;
 	socklen_t addr_len;
 	
-    
-    int ipv6sockfd = rsp_socket(RSP_AF_INET6, RSP_SOCK_DGRAM, 0);
-    if (ipv6sockfd < 0) 
+	
+	int ipv6sockfd = rsp_socket(RSP_AF_INET6, RSP_SOCK_DGRAM, 0);
+	if (ipv6sockfd < 0) 
 	{
-        printf("ipv6_socket failed\n");
+		printf("ipv6_socket failed\n");
 		perror("error:");
 		printf("errno:%d\n",errno);
-        return NULL;
-    }
+		return NULL;
+	}
 
 
 	printf("ipv6 client sockfd:%d\n", ipv6sockfd);
@@ -1062,39 +1062,39 @@ void *ipv6_udp_client_test(void *arg)
 
 
 void *tcp_web_test(void *arg)
-{	
+{
 	int sockfd = rsp_socket(RSP_AF_INET, RSP_SOCK_STREAM, 0);
-    printf("tcp_web_test sockfd:%d\n", sockfd);
-    if (sockfd < 0) 
+	printf("tcp_web_test sockfd:%d\n", sockfd);
+	if (sockfd < 0) 
 	{
-        printf("rsp_socket failed\n");
-        return NULL;
-    }
+		printf("rsp_socket failed\n");
+		return NULL;
+	}
 
-    struct rsp_sockaddr_in my_addr;
-    bzero(&my_addr, sizeof(my_addr));
+	struct rsp_sockaddr_in my_addr;
+	bzero(&my_addr, sizeof(my_addr));
 	my_addr.sin_len = sizeof(my_addr);
-    my_addr.sin_family = RSP_AF_INET;
-    my_addr.sin_port = htons(80);
-    my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	my_addr.sin_family = RSP_AF_INET;
+	my_addr.sin_port = htons(80);
+	my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    int ret = rsp_bind(sockfd, (struct rsp_sockaddr *)&my_addr, sizeof(my_addr));
-    if (ret < 0) 
+	int ret = rsp_bind(sockfd, (struct rsp_sockaddr *)&my_addr, sizeof(my_addr));
+	if (ret < 0) 
 	{
-        printf("rsp_bind failed\n");
-        return NULL;
-    }
+		printf("rsp_bind failed\n");
+		return NULL;
+	}
 
-    ret = rsp_listen(sockfd, MAX_EVENTS);
-    if (ret < 0) 
+	ret = rsp_listen(sockfd, MAX_EVENTS);
+	if (ret < 0) 
 	{
-        printf("rsp_listen failed\n");
-        return NULL;
-    }
+		printf("rsp_listen failed\n");
+		return NULL;
+	}
 
 	tcp_html_select_loop(sockfd);
 
-    return 0;
+	return 0;
 }
 
 
@@ -1105,36 +1105,36 @@ void *tcp_echo_test(void *arg)
 	ff_th_init("tcp echo socket_test");
 	
 	int sockfd = rsp_socket(RSP_AF_INET, RSP_SOCK_STREAM, 0);
-    printf("tcp_echo_test sockfd:%d\n", sockfd);
-    if (sockfd < 0) 
+	printf("tcp_echo_test sockfd:%d\n", sockfd);
+	if (sockfd < 0) 
 	{
-        printf("rsp_socket failed\n");
-        return NULL;
-    }
+		printf("rsp_socket failed\n");
+		return NULL;
+	}
 
-    struct rsp_sockaddr_in my_addr;
-    bzero(&my_addr, sizeof(my_addr));
+	struct rsp_sockaddr_in my_addr;
+	bzero(&my_addr, sizeof(my_addr));
 	my_addr.sin_len = sizeof(my_addr);
-    my_addr.sin_family = RSP_AF_INET;
-    my_addr.sin_port = htons(800);
-    my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	my_addr.sin_family = RSP_AF_INET;
+	my_addr.sin_port = htons(800);
+	my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    int ret = rsp_bind(sockfd, (struct rsp_sockaddr *)&my_addr, sizeof(my_addr));
-    if (ret < 0) 
+	int ret = rsp_bind(sockfd, (struct rsp_sockaddr *)&my_addr, sizeof(my_addr));
+	if (ret < 0) 
 	{
-        printf("rsp_bind failed\n");
-        return NULL;
-    }
+		printf("rsp_bind failed\n");
+		return NULL;
+	}
 
-    ret = rsp_listen(sockfd, MAX_EVENTS);
-    if (ret < 0) 
+	ret = rsp_listen(sockfd, MAX_EVENTS);
+	if (ret < 0) 
 	{
-        printf("rsp_listen failed\n");
-        return NULL;
-    }
+		printf("rsp_listen failed\n");
+		return NULL;
+	}
 
 	tcp_echo_select_loop(sockfd);
-    return 0;
+	return 0;
 }
 
 
@@ -1144,8 +1144,8 @@ void *af_packet_test(void *arg)
 	socklen_t fromlen=sizeof(from);
 	unsigned char buf[2560];
 	unsigned i;
-    struct timeval waittime;
-    rsp_fd_set rset;
+	struct timeval waittime;
+	rsp_fd_set rset;
 	int ret;
 	int clientfd = 0;
 	int maxfd;
@@ -1153,8 +1153,8 @@ void *af_packet_test(void *arg)
 	int packetsockfd;
 
 	ff_th_init("af_packet_test");
-    
-    packetsockfd = rsp_socket(RSP_AF_PACKET, RSP_SOCK_RAW, 0);
+	
+	packetsockfd = rsp_socket(RSP_AF_PACKET, RSP_SOCK_RAW, 0);
 	if (packetsockfd < 0) 
 	{
 		printf("packetsockfd failed\n");
@@ -1195,7 +1195,7 @@ void *af_packet_test(void *arg)
 
 		printf("af_packet send readlen=%d\n",readlen);
 
-        
+		
 	}
 }
 
@@ -1207,33 +1207,33 @@ void *select_test(void *arg)
 	socklen_t fromlen=sizeof(from);
 	char buf[2560];
 	unsigned i;
-    struct timeval waittime;
-    rsp_fd_set rset;
+	struct timeval waittime;
+	rsp_fd_set rset;
 	int ret;
 	int clientfd = 0;
 	int maxfd;
 	int readlen;
 
 	ff_th_init("select_test");
-    
-    int sockfd0 = rsp_socket(RSP_AF_INET, RSP_SOCK_DGRAM, 0);
+	
+	int sockfd0 = rsp_socket(RSP_AF_INET, RSP_SOCK_DGRAM, 0);
 	int sockfd1 = rsp_socket(RSP_AF_INET, RSP_SOCK_DGRAM, 0);
-    
-    if (sockfd0 < 0 || sockfd1 < 0) {
-        printf("rsp_socket failed\n");
-        exit(1);
-    }
+	
+	if (sockfd0 < 0 || sockfd1 < 0) {
+		printf("rsp_socket failed\n");
+		exit(1);
+	}
 
 
 	printf("sockfd0:%d\n", sockfd0);
 	printf("sockfd1:%d\n", sockfd1);
 
-    struct rsp_sockaddr_in my_addr;
-    bzero(&my_addr, sizeof(my_addr));
+	struct rsp_sockaddr_in my_addr;
+	bzero(&my_addr, sizeof(my_addr));
 	my_addr.sin_len = sizeof(my_addr);
-    my_addr.sin_family = RSP_AF_INET;
-    my_addr.sin_port = htons(8011);
-    my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	my_addr.sin_family = RSP_AF_INET;
+	my_addr.sin_port = htons(8011);
+	my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 	ret = rsp_bind(sockfd0, (struct rsp_sockaddr *)&my_addr, sizeof(my_addr));
 	if (ret < 0) 
@@ -1245,28 +1245,28 @@ void *select_test(void *arg)
 	sleep(5);
 
 	
-    bzero(&my_addr, sizeof(my_addr));
+	bzero(&my_addr, sizeof(my_addr));
 	my_addr.sin_len = sizeof(my_addr);
-    my_addr.sin_family = RSP_AF_INET;
-    my_addr.sin_port = htons(8012);
-    my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	my_addr.sin_family = RSP_AF_INET;
+	my_addr.sin_port = htons(8012);
+	my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    ret = rsp_bind(sockfd1, (struct rsp_sockaddr *)&my_addr, sizeof(my_addr));
-    if (ret < 0) {
-        printf("select_test2 rsp_bind failed ret=%d\n",ret);
-        exit(1);
-    }
+	ret = rsp_bind(sockfd1, (struct rsp_sockaddr *)&my_addr, sizeof(my_addr));
+	if (ret < 0) {
+		printf("select_test2 rsp_bind failed ret=%d\n",ret);
+		exit(1);
+	}
 
 	
 
 	while (1)		 
-    {	  
+	{	  
 		waittime.tv_sec	= 10;		   
 		waittime.tv_usec = 0;
 		RSP_FD_ZERO(&rset);	
 		RSP_FD_SET(sockfd0, &rset);
 		RSP_FD_SET(sockfd1, &rset);	
-    	maxfd = sockfd0 > sockfd1?sockfd0:sockfd1; 
+		maxfd = sockfd0 > sockfd1?sockfd0:sockfd1; 
 
 		ret=rsp_select(maxfd+1,&rset,NULL,NULL,&waittime); 
 		if(ret > 0)
@@ -1290,10 +1290,10 @@ void *select_test(void *arg)
 					continue;
 
 				rsp_sendto(sockfd1, buf, readlen,0, &from, fromlen);
-        	} 
-    	}
+			} 
+		}
 	}
-    return 0;
+	return 0;
 }
 
 
@@ -1301,7 +1301,7 @@ void *select_test(void *arg)
 int main(int argc, char * argv[])
 {
 	pthread_t pid;
-    ff_init(argc, argv);
+	ff_init(argc, argv);
 
 #if 1
 	sleep(2);
@@ -1396,5 +1396,5 @@ int main(int argc, char * argv[])
 		//uma_print_stats();
 	}
 
-    
+	
 }
