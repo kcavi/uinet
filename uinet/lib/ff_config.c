@@ -196,13 +196,13 @@ port_cfg_handler(struct ff_config *cfg, const char *section,
             return 0;
         }
 
-		cfg->portid_list = malloc(sizeof(uint16_t)*MAX_ETHPORTS);
+        cfg->portid_list = malloc(sizeof(uint16_t)*MAX_ETHPORTS);
         if (cfg->portid_list == NULL) {
             fprintf(stderr, "parse_port_list malloc failed\n");
             return 0;
         }
-		memset(cfg->portid_list,0,sizeof(uint16_t)*MAX_ETHPORTS);
-		
+        memset(cfg->portid_list,0,sizeof(uint16_t)*MAX_ETHPORTS);
+
         cfg->max_portid = cfg->portid_list[MAX_ETHPORTS-1];
         // initialize lcore list and nb_lcores
         int i;
@@ -215,7 +215,6 @@ port_cfg_handler(struct ff_config *cfg, const char *section,
         }
         cfg->port_cfgs = pc;
 
-		
     }
 
     int portid;
@@ -238,15 +237,18 @@ port_cfg_handler(struct ff_config *cfg, const char *section,
     }
 
     if (strcmp(name, "addr") == 0) {
+        printf("em0: ipaddr:%s\n",value);
         cur->addr = strdup(value);
     } else if (strcmp(name, "netmask") == 0) {
+        printf("em0: netmask:%s\n",value);
         cur->netmask = strdup(value);
     } else if (strcmp(name, "broadcast") == 0) {
         cur->broadcast = strdup(value);
     } else if (strcmp(name, "gateway") == 0) {
+        printf("em0: gateway:%s\n",value);
         cur->gateway = strdup(value);
-	} else if (strcmp(name, "mac") == 0) {
-		set_port_mac(cur->mac,value);
+    } else if (strcmp(name, "mac") == 0) {
+        set_port_mac(cur->mac,value);
     }
 
     return 1;

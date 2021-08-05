@@ -1064,7 +1064,7 @@ void *ipv6_udp_client_test(void *arg)
 void *tcp_web_test(void *arg)
 {
 	int sockfd = rsp_socket(RSP_AF_INET, RSP_SOCK_STREAM, 0);
-	printf("tcp_web_test sockfd:%d\n", sockfd);
+	printf("\nstart web server\n");
 	if (sockfd < 0) 
 	{
 		printf("rsp_socket failed\n");
