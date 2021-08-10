@@ -1,7 +1,19 @@
+ifeq ($(V),1)
+	Q :=
+else
+	Q := -s
+endif
+
+export MAKE := $(MAKE) $(Q)
+
 all:
-	make -C lib
-	make -C example
+	@echo "make uinet at:"`date`
+	@$(MAKE) -C lib
+	@$(MAKE) -C example
+	@$(MAKE) -C tools
 
 clean:
-	make -C lib clean
-	make -C example clean
+	@echo "make clean at:"`date`
+	@$(MAKE) -C lib clean
+	@$(MAKE) -C example clean
+	@$(MAKE) -C tools clean

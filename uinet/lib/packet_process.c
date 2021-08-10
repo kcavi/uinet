@@ -212,8 +212,10 @@ void msg_loop(void)
 	ff_thread_set_name("msg_loop");
 
 	tmp = malloc(10240);
+	packet_fd = socket(PF_PACKET,SOCK_RAW,protocol != 0?htons(protocol):htons(ETH_P_ALL));
 
-	if ( (packet_fd=socket(PF_PACKET,SOCK_RAW,protocol != 0?htons(protocol):htons(ETH_P_ALL)))<0) {
+	if(packet_fd < 0) 
+	{
 		perror("create socket failed");
 		return;
 	}

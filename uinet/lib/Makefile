@@ -323,7 +323,7 @@ HOST_SRCS = ${FF_HOST_SRCS}
 OBJS+= $(patsubst %.c,%.o,${SRCS})
 HOST_OBJS+= $(patsubst %.c,%.o,${HOST_SRCS})
 
-all: libfstack.a
+all: libnetstack.a
 
 
 #
@@ -333,21 +333,23 @@ all: libfstack.a
 # externally available.
 #
 
-libfstack.a:  ${HOST_OBJS}  ${OBJS}
+libnetstack.a:  ${HOST_OBJS}  ${OBJS}
 	ar -cqs $@ ${OBJS} ${HOST_OBJS}
 
 
 
 ${HOST_OBJS}: %.o: %.c
-	${HOST_C}
+	@echo "  CC " $@
+	@${HOST_C}
 
 
 ${OBJS}: %.o: %.c
+	@echo "  CC " $@
 	${NORMAL_C}
 
 
 .PHONY: clean
 clean:
-	rm -f libfstack.a
+	rm -f libnetstack.a
 	rm -f  ${HOST_OBJS} ${OBJS} ${PROGRAM} 
 

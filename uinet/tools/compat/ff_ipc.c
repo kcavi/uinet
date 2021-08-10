@@ -33,6 +33,8 @@
 #include <rte_mempool.h>
 #include <rte_malloc.h>
 #endif
+#include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 //#include "ff_ipc.h"
